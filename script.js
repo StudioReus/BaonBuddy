@@ -292,3 +292,32 @@ window.addEventListener('pointermove', (event) => {
   orb1.style.transform = `translate(${x}px, ${y}px) scale(1.08)`;
   orb2.style.transform = `translate(${x * -0.7}px, ${y * -0.7}px) scale(1.06)`;
 });
+
+const isRecurring = document.getElementById("is-recurring");
+const recurringOptions = document.getElementById("recurring-options");
+
+if (isRecurring) {
+  isRecurring.addEventListener("change", () => {
+    recurringOptions.classList.toggle("hidden", !isRecurring.checked);
+  });
+}
+
+const recurring = document.getElementById("is-recurring")?.checked || false;
+const frequency = document.getElementById("frequency")?.value || "monthly";
+
+const newTransaction = {
+  id: createId(),
+  type: type === "income" ? "income" : "expense",
+  category,
+  amount,
+  date,
+  recurring,
+  frequency
+};
+
+if (transaction.recurring) {
+  const badge = document.createElement("span");
+  badge.className = "recurring-badge";
+  badge.textContent = transaction.frequency;
+  details.appendChild(badge);
+}
