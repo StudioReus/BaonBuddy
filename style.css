@@ -37,11 +37,7 @@ body {
   min-height: 100vh;
   font-family: 'Poppins', sans-serif;
   color: var(--text);
-  background:
-    radial-gradient(circle at 15% 15%, rgba(255, 143, 200, 0.2), transparent 24%),
-    radial-gradient(circle at 80% 10%, rgba(159, 225, 255, 0.24), transparent 26%),
-    radial-gradient(circle at 60% 80%, rgba(143, 231, 193, 0.16), transparent 26%),
-    linear-gradient(135deg, var(--bg-1), var(--bg-2) 48%, var(--bg-3));
+  background: 249, 242, 255;
   overflow-x: hidden;
 }
 
@@ -50,7 +46,7 @@ body::before {
   position: fixed;
   inset: 0;
   background-image:
-    linear-gradient(rgba(255,255,255,0.28) 1px, transparent 1px),
+    linear-gradient(rgba(242,232,255,0.8) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255,255,255,0.28) 1px, transparent 1px);
   background-size: 22px 22px;
   mask-image: radial-gradient(circle at center, black 55%, transparent 100%);
