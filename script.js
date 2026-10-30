@@ -31,10 +31,17 @@ function saveTransactions(transactions) {
 }
 
 function formatMoney(value) {
-  return new Intl.NumberFormat("en-PH", {
+  const amount = Number(value) || 0;
+  const parts = new Intl.NumberFormat("en-PH", {
     style: "currency",
-    currency: "PHP"
-  }).format(value);
+    currency: "PHP",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).formatToParts(amount);
+
+  return parts
+    .map((part) => (part.type === "currency" ? "₱" : part.value))
+    .join("");
 }
 
 function updateSummary() {
