@@ -359,7 +359,6 @@ body::before {
 }
 
 .startup-content {
-  font-family: 'Gorditas', cursive;
   padding-top: 32px;
   position: relative;
   width: min(92vw, 660px);
