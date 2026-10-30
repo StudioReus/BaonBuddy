@@ -238,3 +238,15 @@ if (startupScreen) {
 } else {
   appBody.classList.add("app-ready");
 }
+
+const startupScreen = document.getElementById("startup-screen");
+const appBody = document.body;
+
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    if (startupScreen) {
+      startupScreen.classList.add("hidden");
+    }
+    appBody.classList.add("app-ready");
+  }, 1700);
+});
