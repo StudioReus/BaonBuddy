@@ -3,6 +3,7 @@ const list = document.getElementById("transaction-list");
 const incomeEl = document.getElementById("total-income");
 const expensesEl = document.getElementById("total-expenses");
 const balanceEl = document.getElementById("remaining-balance");
+const downloadButton = document.getElementById("download-csv");
 
 const STORAGE_KEY = "budget-transactions";
 
@@ -131,6 +132,46 @@ function formatDate(dateString) {
   }).format(date);
 }
 
+function escapeCsvCell(value) {
+  const text = String(value ?? "");
+
+  if (/[",\n\r]/.test(text)) {
+    return `"${text.replace(/"/g, '""')}"`;
+  }
+
+  return text;
+}
+
+function downloadTransactionsCsv() {
+  const transactions = getTransactions();
+  const rows = [
+    ["Type", "Category", "Amount", "Date"],
+    ...transactions.map((transaction) => [
+      transaction.type,
+      transaction.category,
+      Number(transaction.amount).toFixed(2),
+      transaction.date
+    ])
+  ];
+
+  const csvContent = rows
+    .map((row) => row.map(escapeCsvCell).join(","))
+    .join("\n");
+
+  const blob = new Blob([csvContent], {
+    type: "text/csv;charset=utf-8;"
+  });
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "baonbuddy-transactions.csv";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
 function createTransactionItem(transaction) {
   const item = document.createElement("li");
   item.className = "transaction-item";
@@ -150,7 +191,7 @@ function createTransactionItem(transaction) {
 
   const amount = document.createElement("span");
   amount.className = `amount ${transaction.type === "income" ? "income" : "expense"}`;
-  amount.textContent = `${transaction.type === "income" ? "+" : "-" }${formatMoney(transaction.amount)}`;
+  amount.textContent = `${transaction.type === "income" ? "+" : "-"}${formatMoney(transaction.amount)}`;
 
   const removeButton = document.createElement("button");
   removeButton.type = "button";
@@ -221,6 +262,10 @@ function handleSubmit(event) {
 
 if (form) {
   form.addEventListener("submit", handleSubmit);
+}
+
+if (downloadButton) {
+  downloadButton.addEventListener("click", downloadTransactionsCsv);
 }
 
 renderTransactions();
