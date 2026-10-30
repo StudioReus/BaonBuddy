@@ -3,7 +3,6 @@ const list = document.getElementById("transaction-list");
 const incomeEl = document.getElementById("total-income");
 const expensesEl = document.getElementById("total-expenses");
 const balanceEl = document.getElementById("remaining-balance");
-const downloadBtn = document.getElementById("download-csv");
 
 const STORAGE_KEY = "budget-transactions";
 
@@ -55,13 +54,19 @@ function getTransactions() {
       .map(normalizeTransaction)
       .filter(Boolean);
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(validTransactions));
-    return validTransactions;
-  } catch (error) {
-    console.warn("Could not read saved transactions. Resetting to empty state.", error);
+    if (validTransactions.length > 0) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(validTransactions));
+      return validTransactions;
+    }
+
     localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
     return [];
+  } catch (error) {
+    console.warn("Could not read saved transactions. Resetting to empty state.", error);
   }
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+  return [];
 }
 
 function saveTransactions(transactions) {
@@ -150,8 +155,8 @@ function createTransactionItem(transaction) {
   const removeButton = document.createElement("button");
   removeButton.type = "button";
   removeButton.className = "delete-button";
-  removeButton.textContent = "Delete";
   removeButton.setAttribute("aria-label", `Delete ${transaction.category}`);
+  removeButton.textContent = "Delete";
   removeButton.addEventListener("click", () => {
     const transactions = getTransactions().filter((entry) => entry.id !== transaction.id);
     saveTransactions(transactions);
@@ -216,32 +221,6 @@ function handleSubmit(event) {
 
 if (form) {
   form.addEventListener("submit", handleSubmit);
-}
-
-if (downloadBtn) {
-  downloadBtn.addEventListener("click", () => {
-    const transactions = getTransactions();
-
-    if (!transactions.length) {
-      alert("No transactions yet. Add one first.");
-      return;
-    }
-
-    const rows = [["Type", "Category", "Amount", "Date"]];
-
-    transactions.forEach((transaction) => {
-      rows.push([transaction.type, transaction.category, transaction.amount, transaction.date]);
-    });
-
-    const csv = rows.map((row) => row.join(",")).join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "student-expense-tracker.csv";
-    link.click();
-    URL.revokeObjectURL(url);
-  });
 }
 
 renderTransactions();
