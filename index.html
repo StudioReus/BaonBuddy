@@ -144,6 +144,50 @@
         <p>Save your tracked expenses as a spreadsheet file.</p>
         <button type="button" id="download-csv">Download CSV</button>
       </section>
+
+      <form id="transaction-form">
+  <div>
+    <label for="type">Type</label>
+    <select id="type" name="type" required>
+      <option value="income">Income</option>
+      <option value="expense">Expense</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="category">Category</label>
+    <input id="category" name="category" type="text" placeholder="Food, Allowance..." required />
+  </div>
+
+  <div>
+    <label for="amount">Amount</label>
+    <input id="amount" name="amount" type="number" step="0.01" min="0" placeholder="0.00" required />
+  </div>
+
+  <div>
+    <label for="date">Date</label>
+    <input id="date" name="date" type="date" required />
+  </div>
+
+  <div class="recurring-toggle">
+    <label>
+      <input type="checkbox" id="is-recurring" />
+      Recurring
+    </label>
+  </div>
+
+  <div id="recurring-options" class="hidden">
+    <label for="frequency">Repeat</label>
+    <select id="frequency">
+      <option value="weekly">Weekly</option>
+      <option value="monthly" selected>Monthly</option>
+      <option value="yearly">Yearly</option>
+    </select>
+  </div>
+
+  <button type="submit">Save Transaction</button>
+</form>
+      
     </main>
   </body>
 </html>
