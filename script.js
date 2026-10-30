@@ -1,133 +1,238 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BaonBuddy</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="script.js" defer></script>
-</head>
+const form = document.getElementById("transaction-form");
+const list = document.getElementById("transaction-list");
+const incomeEl = document.getElementById("total-income");
+const expensesEl = document.getElementById("total-expenses");
+const balanceEl = document.getElementById("remaining-balance");
 
-<body>
-  <main class="app">
-    <header class="page-header">
-      <h1>BaonBuddy</h1>
-      <p>Track your income, expenses, and savings.</p>
-    </header>
+const STORAGE_KEY = "budget-transactions";
 
-    <section class="dashboard" aria-label="Budget summary">
-      <div class="card income">
-        <h2>Total Income</h2>
-        <p id="total-income">₱0.00</p>
-      </div>
+function createId() {
+  if (window.crypto && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
 
-      <div class="card expenses">
-        <h2>Total Expenses</h2>
-        <p id="total-expenses">₱0.00</p>
-      </div>
+  return `tx-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
 
-      <div class="card balance">
-        <h2>Remaining Balance</h2>
-        <p id="remaining-balance">₱0.00</p>
-      </div>
-    </section>
+function safeNumber(value) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
 
-    <section class="entry-form">
-      <h2>Add Transaction</h2>
+function normalizeTransaction(rawTransaction = {}) {
+  if (!rawTransaction || typeof rawTransaction !== "object") {
+    return null;
+  }
 
-      <form id="transaction-form">
-        <div>
-          <label for="type">Type</label>
-          <select id="type" name="type" required>
-            <option value="income">Income</option>
-            <option value="expense">Expense</option>
-          </select>
-        </div>
+  const type = rawTransaction.type === "income" ? "income" : "expense";
+  const category = typeof rawTransaction.category === "string" ? rawTransaction.category.trim() : "";
+  const amount = safeNumber(rawTransaction.amount);
+  const date = typeof rawTransaction.date === "string" ? rawTransaction.date : "";
 
-        <div>
-          <label for="category">Category</label>
-          <input
-            id="category"
-            name="category"
-            type="text"
-            placeholder="Food, Rent, Salary..."
-            required
-          />
-        </div>
+  if (!category || !date || amount <= 0) {
+    return null;
+  }
 
-        <div>
-          <label for="amount">Amount</label>
-          <input
-            id="amount"
-            name="amount"
-            type="number"
-            step="0.01"
-            min="0"
-            placeholder="0.00"
-            required
-          />
-        </div>
+  return {
+    id: rawTransaction.id || createId(),
+    type,
+    category,
+    amount,
+    date
+  };
+}
 
-        <div>
-          <label for="date">Date</label>
-          <input id="date" name="date" type="date" required />
-        </div>
+function getTransactions() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
 
-        <button type="submit">Save Transaction</button>
-      </form>
-    </section>
+    if (!Array.isArray(stored)) {
+      throw new Error("Stored data is not an array");
+    }
 
-    <section class="history">
-      <h2>Recent Transactions</h2>
-      <ul id="transaction-list"></ul>
-    </section>
+    const validTransactions = stored
+      .map(normalizeTransaction)
+      .filter(Boolean);
 
-    <section class="guides">
-  <h2>Budgeting Guide for Students</h2>
+    if (validTransactions.length > 0) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(validTransactions));
+      return validTransactions;
+    }
 
-  <div class="guide-grid">
-    <article class="guide-card">
-      <h3>50/30/20 Rule</h3>
-      <p>
-        Allocate 50% for needs, 30% for wants, and 20% for savings.
-      </p>
-    </article>
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+    return [];
+  } catch (error) {
+    console.warn("Could not read saved transactions. Resetting to empty state.", error);
+  }
 
-    <article class="guide-card">
-      <h3>Weekly Allowance Plan</h3>
-      <p>
-        Divide your weekly allowance into food, transportation, school needs,
-        and emergency buffer.
-      </p>
-    </article>
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+  return [];
+}
 
-    <article class="guide-card">
-      <h3>Save Before Spending</h3>
-      <p>
-        Set aside a portion of your allowance first before buying non-essential
-        items.
-      </p>
-    </article>
-  </div>
-</section>
+function saveTransactions(transactions) {
+  const safeTransactions = transactions
+    .map(normalizeTransaction)
+    .filter(Boolean);
 
-<section class="tips">
-  <h2>Savings Tips</h2>
-  <ul>
-    <li>Keep a daily spending log.</li>
-    <li>Use cash envelopes for food and transportation.</li>
-    <li>Avoid buying items that are not part of your budget.</li>
-    <li>Set a weekly savings goal like ₱100 or ₱200.</li>
-    <li>Save extra money from your allowance for emergencies or school projects.</li>
-  </ul>
-</section>
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(safeTransactions));
+  return safeTransactions;
+}
 
-<section class="download-section">
-  <h2>Download Expense Tracker</h2>
-  <p>Save your tracked expenses as a spreadsheet file.</p>
-  <button type="button" id="download-csv">Download CSV</button>
-</section>
-    
-  </main>
-</body>
-</html>
+function formatMoney(value) {
+  return new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(safeNumber(value));
+}
+
+function getSummary(transactions) {
+  const totalIncome = transactions
+    .filter((transaction) => transaction.type === "income")
+    .reduce((sum, transaction) => sum + safeNumber(transaction.amount), 0);
+
+  const totalExpenses = transactions
+    .filter((transaction) => transaction.type === "expense")
+    .reduce((sum, transaction) => sum + safeNumber(transaction.amount), 0);
+
+  return {
+    totalIncome,
+    totalExpenses,
+    balance: totalIncome - totalExpenses
+  };
+}
+
+function updateSummary() {
+  const transactions = getTransactions();
+  const { totalIncome, totalExpenses, balance } = getSummary(transactions);
+
+  if (incomeEl) incomeEl.textContent = formatMoney(totalIncome);
+  if (expensesEl) expensesEl.textContent = formatMoney(totalExpenses);
+  if (balanceEl) {
+    balanceEl.textContent = formatMoney(balance);
+    balanceEl.style.color = balance >= 0 ? "#16a34a" : "#dc2626";
+  }
+}
+
+function formatDate(dateString) {
+  if (!dateString) return "No date";
+
+  const date = new Date(dateString + "T00:00:00");
+
+  if (Number.isNaN(date.getTime())) {
+    return dateString;
+  }
+
+  return new Intl.DateTimeFormat("en-PH", {
+    year: "numeric",
+    month: "short",
+    day: "numeric"
+  }).format(date);
+}
+
+function createTransactionItem(transaction) {
+  const item = document.createElement("li");
+  item.className = "transaction-item";
+
+  const details = document.createElement("div");
+  details.className = "transaction-details";
+
+  const category = document.createElement("span");
+  category.className = "transaction-category";
+  category.textContent = transaction.category;
+
+  const date = document.createElement("small");
+  date.className = "transaction-date";
+  date.textContent = formatDate(transaction.date);
+
+  details.append(category, date);
+
+  const amount = document.createElement("span");
+  amount.className = `amount ${transaction.type === "income" ? "income" : "expense"}`;
+  amount.textContent = `${transaction.type === "income" ? "+" : "-"}${formatMoney(transaction.amount)}`;
+
+  const removeButton = document.createElement("button");
+  removeButton.type = "button";
+  removeButton.className = "delete-button";
+  removeButton.setAttribute("aria-label", `Delete ${transaction.category}`);
+  removeButton.textContent = "Delete";
+  removeButton.addEventListener("click", () => {
+    const transactions = getTransactions().filter((entry) => entry.id !== transaction.id);
+    saveTransactions(transactions);
+    renderTransactions();
+  });
+
+  item.append(details, amount, removeButton);
+  return item;
+}
+
+function renderTransactions() {
+  if (!list) return;
+
+  const transactions = getTransactions();
+  list.innerHTML = "";
+
+  if (!transactions.length) {
+    const empty = document.createElement("li");
+    empty.className = "empty-state";
+    empty.textContent = "No transactions yet.";
+    list.appendChild(empty);
+    updateSummary();
+    return;
+  }
+
+  transactions.forEach((transaction) => {
+    list.appendChild(createTransactionItem(transaction));
+  });
+
+  updateSummary();
+}
+
+function handleSubmit(event) {
+  event.preventDefault();
+
+  if (!form) return;
+
+  const type = document.getElementById("type")?.value || "expense";
+  const category = document.getElementById("category")?.value.trim() || "";
+  const amountValue = document.getElementById("amount")?.value;
+  const date = document.getElementById("date")?.value || "";
+  const amount = safeNumber(amountValue);
+
+  if (!category || !date || amount <= 0) {
+    alert("Please fill out all fields with a valid amount.");
+    return;
+  }
+
+  const newTransaction = {
+    id: createId(),
+    type: type === "income" ? "income" : "expense",
+    category,
+    amount,
+    date
+  };
+
+  const transactions = [...getTransactions(), newTransaction];
+  saveTransactions(transactions);
+  form.reset();
+  renderTransactions();
+}
+
+if (form) {
+  form.addEventListener("submit", handleSubmit);
+}
+
+renderTransactions();
+
+const startupScreen = document.getElementById("startup-screen");
+const appBody = document.body;
+
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    if (startupScreen) {
+      startupScreen.classList.add("hidden");
+    }
+    appBody.classList.add("app-ready");
+  }, 1700);
+});
