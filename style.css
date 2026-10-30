@@ -412,12 +412,12 @@ body::before {
   font-weight: 800;
 }
 
-.Startup-contentup-content h1 {
+..startup-content h1 {
   position: relative;
   z-index: 1;
   margin: 18px 0 10px;
   font-family: 'Gorditas', cursive;
-  font-size: clamp(2.8rem, 5vw, 4.7rem);
+  font-size: clamp(4.5rem, 9vw, 8rem);
   line-height: 1;
   letter-spacing: -0.06em;
   color: var(--brown);
