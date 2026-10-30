@@ -14,12 +14,6 @@ function createId() {
   return `tx-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
-const DEFAULT_TRANSACTIONS = [
-  { id: createId(), type: "income", category: "Salary", amount: 2500, date: "2026-10-01" },
-  { id: createId(), type: "expense", category: "Groceries", amount: 120.5, date: "2026-10-02" },
-  { id: createId(), type: "expense", category: "Rent", amount: 900, date: "2026-10-03" }
-];
-
 function safeNumber(value) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : 0;
@@ -64,12 +58,15 @@ function getTransactions() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(validTransactions));
       return validTransactions;
     }
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+    return [];
   } catch (error) {
-    console.warn("Could not read saved transactions. Resetting to defaults.", error);
+    console.warn("Could not read saved transactions. Resetting to empty state.", error);
   }
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_TRANSACTIONS));
-  return DEFAULT_TRANSACTIONS.map((transaction) => ({ ...transaction }));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+  return [];
 }
 
 function saveTransactions(transactions) {
