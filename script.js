@@ -228,11 +228,13 @@ renderTransactions();
 const startupScreen = document.getElementById("startup-screen");
 const appBody = document.body;
 
-window.addEventListener("load", () => {
-  setTimeout(() => {
-    if (startupScreen) {
+if (startupScreen) {
+  window.addEventListener("load", () => {
+    setTimeout(() => {
       startupScreen.classList.add("hidden");
-    }
-    appBody.classList.add("app-ready");
-  }, 1700);
-});
+      appBody.classList.add("app-ready");
+    }, 1700);
+  });
+} else {
+  appBody.classList.add("app-ready");
+}
