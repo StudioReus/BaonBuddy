@@ -1,133 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BaonBuddy</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="script.js" defer></script>
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BaonBuddy</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+  </head>
 
-<body>
-  <main class="app">
-    <header class="page-header">
-      <h1>BaonBuddy</h1>
-      <p>Track your income, expenses, and savings.</p>
-    </header>
+  <body>
+    <div class="startup-screen" id="startup-screen" aria-live="polite">
+      <div class="startup-content">
+        <div class="startup-orb orb-1"></div>
+        <div class="startup-orb orb-2"></div>
 
-    <section class="dashboard" aria-label="Budget summary">
-      <div class="card income">
-        <h2>Total Income</h2>
-        <p id="total-income">₱0.00</p>
+        <div class="brand-mark">₱</div>
+        <p class="eyebrow">Smart Money Flow</p>
+        <h1>BaonBuddy</h1>
+        <p class="startup-tagline">
+          Track your allowance, expenses, and savings with a calmer, smarter budget flow.
+        </p>
+
+        <div class="startup-loader" aria-label="Loading">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
       </div>
+    </div>
 
-      <div class="card expenses">
-        <h2>Total Expenses</h2>
-        <p id="total-expenses">₱0.00</p>
-      </div>
+    <main class="app">
+      <header class="page-header">
+        <h1>BaonBuddy</h1>
+        <p>Track your income, expenses, and savings.</p>
+      </header>
 
-      <div class="card balance">
-        <h2>Remaining Balance</h2>
-        <p id="remaining-balance">₱0.00</p>
-      </div>
-    </section>
-
-    <section class="entry-form">
-      <h2>Add Transaction</h2>
-
-      <form id="transaction-form">
-        <div>
-          <label for="type">Type</label>
-          <select id="type" name="type" required>
-            <option value="income">Income</option>
-            <option value="expense">Expense</option>
-          </select>
+      <section class="dashboard" aria-label="Budget summary">
+        <div class="card income">
+          <h2>Total Income</h2>
+          <p id="total-income">₱0.00</p>
         </div>
 
-        <div>
-          <label for="category">Category</label>
-          <input
-            id="category"
-            name="category"
-            type="text"
-            placeholder="Food, Rent, Salary..."
-            required
-          />
+        <div class="card expenses">
+          <h2>Total Expenses</h2>
+          <p id="total-expenses">₱0.00</p>
         </div>
 
-        <div>
-          <label for="amount">Amount</label>
-          <input
-            id="amount"
-            name="amount"
-            type="number"
-            step="0.01"
-            min="0"
-            placeholder="0.00"
-            required
-          />
+        <div class="card balance">
+          <h2>Remaining Balance</h2>
+          <p id="remaining-balance">₱0.00</p>
         </div>
+      </section>
 
-        <div>
-          <label for="date">Date</label>
-          <input id="date" name="date" type="date" required />
+      <section class="entry-form">
+        <h2>Add Transaction</h2>
+
+        <form id="transaction-form">
+          <div>
+            <label for="type">Type</label>
+            <select id="type" name="type" required>
+              <option value="income">Income</option>
+              <option value="expense">Expense</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="category">Category</label>
+            <input
+              id="category"
+              name="category"
+              type="text"
+              placeholder="Food, Rent, Salary..."
+              required
+            />
+          </div>
+
+          <div>
+            <label for="amount">Amount</label>
+            <input
+              id="amount"
+              name="amount"
+              type="number"
+              step="0.01"
+              min="0"
+              placeholder="0.00"
+              required
+            />
+          </div>
+
+          <div>
+            <label for="date">Date</label>
+            <input id="date" name="date" type="date" required />
+          </div>
+
+          <button type="submit">Save Transaction</button>
+        </form>
+      </section>
+
+      <section class="history">
+        <h2>Recent Transactions</h2>
+        <ul id="transaction-list"></ul>
+      </section>
+
+      <section class="guides">
+        <h2>Budgeting Guide for Students</h2>
+
+        <div class="guide-grid">
+          <article class="guide-card">
+            <h3>50/30/20 Rule</h3>
+            <p>Allocate 50% for needs, 30% for wants, and 20% for savings.</p>
+          </article>
+
+          <article class="guide-card">
+            <h3>Weekly Allowance Plan</h3>
+            <p>
+              Divide your weekly allowance into food, transportation, school needs,
+              and emergency buffer.
+            </p>
+          </article>
+
+          <article class="guide-card">
+            <h3>Save Before Spending</h3>
+            <p>
+              Set aside a portion of your allowance first before buying non-essential
+              items.
+            </p>
+          </article>
         </div>
+      </section>
 
-        <button type="submit">Save Transaction</button>
-      </form>
-    </section>
+      <section class="tips">
+        <h2>Savings Tips</h2>
+        <ul>
+          <li>Keep a daily spending log.</li>
+          <li>Use cash envelopes for food and transportation.</li>
+          <li>Avoid buying items that are not part of your budget.</li>
+          <li>Set a weekly savings goal like ₱100 or ₱200.</li>
+          <li>Save extra money from your allowance for emergencies or school projects.</li>
+        </ul>
+      </section>
 
-    <section class="history">
-      <h2>Recent Transactions</h2>
-      <ul id="transaction-list"></ul>
-    </section>
+      <section class="download-section">
+        <h2>Download Expense Tracker</h2>
+        <p>Save your tracked expenses as a spreadsheet file.</p>
+        <button type="button" id="download-csv">Download CSV</button>
+      </section>
+    </main>
 
-    <section class="guides">
-  <h2>Budgeting Guide for Students</h2>
+    <script>
+      const startupScreen = document.getElementById('startup-screen');
+      const appBody = document.body;
 
-  <div class="guide-grid">
-    <article class="guide-card">
-      <h3>50/30/20 Rule</h3>
-      <p>
-        Allocate 50% for needs, 30% for wants, and 20% for savings.
-      </p>
-    </article>
-
-    <article class="guide-card">
-      <h3>Weekly Allowance Plan</h3>
-      <p>
-        Divide your weekly allowance into food, transportation, school needs,
-        and emergency buffer.
-      </p>
-    </article>
-
-    <article class="guide-card">
-      <h3>Save Before Spending</h3>
-      <p>
-        Set aside a portion of your allowance first before buying non-essential
-        items.
-      </p>
-    </article>
-  </div>
-</section>
-
-<section class="tips">
-  <h2>Savings Tips</h2>
-  <ul>
-    <li>Keep a daily spending log.</li>
-    <li>Use cash envelopes for food and transportation.</li>
-    <li>Avoid buying items that are not part of your budget.</li>
-    <li>Set a weekly savings goal like ₱100 or ₱200.</li>
-    <li>Save extra money from your allowance for emergencies or school projects.</li>
-  </ul>
-</section>
-
-<section class="download-section">
-  <h2>Download Expense Tracker</h2>
-  <p>Save your tracked expenses as a spreadsheet file.</p>
-  <button type="button" id="download-csv">Download CSV</button>
-</section>
-    
-  </main>
-</body>
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          if (startupScreen) {
+            startupScreen.classList.add('hidden');
+          }
+          appBody.classList.add('app-ready');
+        }, 1700);
+      });
+    </script>
+  </body>
 </html>
