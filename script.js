@@ -236,3 +236,14 @@ window.addEventListener("load", () => {
     appBody.classList.add("app-ready");
   }, 1700);
 });
+
+const orb1 = document.querySelector('.orb-1');
+const orb2 = document.querySelector('.orb-2');
+
+window.addEventListener('pointermove', (event) => {
+  const x = (event.clientX / window.innerWidth - 0.5) * 30;
+  const y = (event.clientY / window.innerHeight - 0.5) * 30;
+
+  orb1.style.transform = `translate(${x}px, ${y}px) scale(1.08)`;
+  orb2.style.transform = `translate(${x * -0.7}px, ${y * -0.7}px) scale(1.06)`;
+});
