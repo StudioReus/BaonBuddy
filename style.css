@@ -359,6 +359,7 @@ body::before {
 }
 
 .startup-content {
+  padding-top: 32px;
   position: relative;
   width: min(92vw, 660px);
   min-height: 370px;
@@ -379,6 +380,8 @@ body::before {
   filter: blur(18px);
   opacity: 0.9;
   animation: drift 10s ease-in-out infinite alternate;
+  will-change: transform;
+  transition: transform 0.25s ease-out;
 }
 
 .orb-1 {
@@ -397,24 +400,6 @@ body::before {
   background: rgba(243, 155, 91, 0.38);
   animation-delay: 0.4s;
 }
-
-.brand-mark {
-  position: relative;
-  z-index: 1;
-  width: 110px;
-  height: 110px;
-  margin: 0 auto 18px;
-  display: grid;
-  place-items: center;
-  border-radius: 28px;
-  background: var(--orange-deep);
-  color: white;
-  font-size: 3rem;
-  font-weight: 800;
-  box-shadow: 0 20px 30px rgba(217, 109, 45, 0.15);
-  animation: pulse 1.6s ease-in-out infinite;
-}
-
 .eyebrow {
   position: relative;
   z-index: 1;
@@ -426,7 +411,7 @@ body::before {
   font-weight: 800;
 }
 
-.startup-content h1 {
+.Startup-contentup-content h1 {
   position: relative;
   z-index: 1;
   margin: 18px 0 10px;
