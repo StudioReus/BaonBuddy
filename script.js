@@ -4,112 +4,215 @@ const incomeEl = document.getElementById("total-income");
 const expensesEl = document.getElementById("total-expenses");
 const balanceEl = document.getElementById("remaining-balance");
 
-const storageKey = "budget-transactions";
-
-const defaultTransactions = [
-  { type: "income", category: "Salary", amount: 2500, date: "2026-10-01" },
-  { type: "expense", category: "Groceries", amount: 120.5, date: "2026-10-02" },
-  { type: "expense", category: "Rent", amount: 900, date: "2026-10-03" }
+const STORAGE_KEY = "budget-transactions";
+const DEFAULT_TRANSACTIONS = [
+  { id: crypto.randomUUID(), type: "income", category: "Salary", amount: 2500, date: "2026-10-01" },
+  { id: crypto.randomUUID(), type: "expense", category: "Groceries", amount: 120.5, date: "2026-10-02" },
+  { id: crypto.randomUUID(), type: "expense", category: "Rent", amount: 900, date: "2026-10-03" }
 ];
+
+function safeNumber(value) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function normalizeTransaction(rawTransaction = {}) {
+  if (!rawTransaction || typeof rawTransaction !== "object") {
+    return null;
+  }
+
+  const type = rawTransaction.type === "income" ? "income" : "expense";
+  const category = typeof rawTransaction.category === "string" ? rawTransaction.category.trim() : "";
+  const amount = safeNumber(rawTransaction.amount);
+  const date = typeof rawTransaction.date === "string" ? rawTransaction.date : "";
+
+  if (!category || !date || amount <= 0) {
+    return null;
+  }
+
+  return {
+    id: rawTransaction.id || crypto.randomUUID(),
+    type,
+    category,
+    amount,
+    date
+  };
+}
 
 function getTransactions() {
   try {
-    const stored = JSON.parse(localStorage.getItem(storageKey));
-    if (Array.isArray(stored) && stored.length > 0) {
-      return stored;
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
+
+    if (!Array.isArray(stored)) {
+      throw new Error("Stored data is not an array");
+    }
+
+    const validTransactions = stored
+      .map(normalizeTransaction)
+      .filter(Boolean);
+
+    if (validTransactions.length > 0) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(validTransactions));
+      return validTransactions;
     }
   } catch (error) {
-    console.warn("Could not read saved transactions:", error);
+    console.warn("Could not read saved transactions. Resetting to defaults.", error);
   }
 
-  localStorage.setItem(storageKey, JSON.stringify(defaultTransactions));
-  return [...defaultTransactions];
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_TRANSACTIONS));
+  return DEFAULT_TRANSACTIONS.map((transaction) => ({ ...transaction }));
 }
 
 function saveTransactions(transactions) {
-  localStorage.setItem(storageKey, JSON.stringify(transactions));
+  const safeTransactions = transactions
+    .map(normalizeTransaction)
+    .filter(Boolean);
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(safeTransactions));
+  return safeTransactions;
 }
 
 function formatMoney(value) {
-  const amount = Number(value) || 0;
   return new Intl.NumberFormat("en-PH", {
     style: "currency",
     currency: "PHP",
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
-  }).format(amount);
+  }).format(safeNumber(value));
+}
+
+function getSummary(transactions) {
+  const totalIncome = transactions
+    .filter((transaction) => transaction.type === "income")
+    .reduce((sum, transaction) => sum + safeNumber(transaction.amount), 0);
+
+  const totalExpenses = transactions
+    .filter((transaction) => transaction.type === "expense")
+    .reduce((sum, transaction) => sum + safeNumber(transaction.amount), 0);
+
+  return {
+    totalIncome,
+    totalExpenses,
+    balance: totalIncome - totalExpenses
+  };
 }
 
 function updateSummary() {
   const transactions = getTransactions();
-
-  const totalIncome = transactions
-    .filter((transaction) => transaction.type === "income")
-    .reduce((sum, transaction) => sum + Number(transaction.amount), 0);
-
-  const totalExpenses = transactions
-    .filter((transaction) => transaction.type === "expense")
-    .reduce((sum, transaction) => sum + Number(transaction.amount), 0);
-
-  const balance = totalIncome - totalExpenses;
+  const { totalIncome, totalExpenses, balance } = getSummary(transactions);
 
   incomeEl.textContent = formatMoney(totalIncome);
   expensesEl.textContent = formatMoney(totalExpenses);
   balanceEl.textContent = formatMoney(balance);
+  balanceEl.style.color = balance >= 0 ? "#16a34a" : "#dc2626";
+}
+
+function formatDate(dateString) {
+  if (!dateString) return "No date";
+
+  const date = new Date(dateString + "T00:00:00");
+
+  if (Number.isNaN(date.getTime())) {
+    return dateString;
+  }
+
+  return new Intl.DateTimeFormat("en-PH", {
+    year: "numeric",
+    month: "short",
+    day: "numeric"
+  }).format(date);
+}
+
+function createTransactionItem(transaction) {
+  const item = document.createElement("li");
+  item.className = "transaction-item";
+
+  const details = document.createElement("div");
+  details.className = "transaction-details";
+
+  const category = document.createElement("span");
+  category.className = "transaction-category";
+  category.textContent = transaction.category;
+
+  const date = document.createElement("small");
+  date.className = "transaction-date";
+  date.textContent = formatDate(transaction.date);
+
+  details.append(category, date);
+
+  const amount = document.createElement("span");
+  amount.className = `amount ${transaction.type === "income" ? "income" : "expense"}`;
+  amount.textContent = `${transaction.type === "income" ? "+" : "-"}${formatMoney(transaction.amount)}`;
+
+  const removeButton = document.createElement("button");
+  removeButton.type = "button";
+  removeButton.className = "delete-button";
+  removeButton.setAttribute("aria-label", `Delete ${transaction.category}`);
+  removeButton.textContent = "Delete";
+  removeButton.addEventListener("click", () => {
+    const transactions = getTransactions().filter((entry) => entry.id !== transaction.id);
+    saveTransactions(transactions);
+    renderTransactions();
+  });
+
+  item.append(details, amount, removeButton);
+  return item;
 }
 
 function renderTransactions() {
+  if (!list) return;
+
   const transactions = getTransactions();
   list.innerHTML = "";
 
   if (!transactions.length) {
-    list.innerHTML = "<li>No transactions yet.</li>";
+    const empty = document.createElement("li");
+    empty.className = "empty-state";
+    empty.textContent = "No transactions yet.";
+    list.appendChild(empty);
     updateSummary();
     return;
   }
 
   transactions.forEach((transaction) => {
-    const item = document.createElement("li");
-
-    const label = document.createElement("span");
-    label.textContent = transaction.category;
-
-    const amount = document.createElement("span");
-    amount.classList.add(
-      transaction.type === "income" ? "amount income" : "amount expense"
-    );
-
-    const sign = transaction.type === "income" ? "+" : "-";
-    amount.textContent = `${sign}${formatMoney(Number(transaction.amount))}`;
-
-    item.append(label, amount);
-    list.appendChild(item);
+    list.appendChild(createTransactionItem(transaction));
   });
 
   updateSummary();
 }
 
-form.addEventListener("submit", function (event) {
+function handleSubmit(event) {
   event.preventDefault();
 
-  const transaction = {
-    type: document.getElementById("type").value,
-    category: document.getElementById("category").value.trim(),
-    amount: Number(document.getElementById("amount").value),
-    date: document.getElementById("date").value
-  };
+  if (!form) return;
 
-  if (!transaction.category || !transaction.amount || transaction.amount <= 0 || !transaction.date) {
+  const type = document.getElementById("type")?.value || "expense";
+  const category = document.getElementById("category")?.value.trim() || "";
+  const amountValue = document.getElementById("amount")?.value;
+  const date = document.getElementById("date")?.value || "";
+  const amount = safeNumber(amountValue);
+
+  if (!category || !date || amount <= 0) {
     alert("Please fill out all fields with a valid amount.");
     return;
   }
 
-  const transactions = [...getTransactions()];
-  transactions.push(transaction);
-  saveTransactions(transactions);
+  const newTransaction = {
+    id: crypto.randomUUID(),
+    type: type === "income" ? "income" : "expense",
+    category,
+    amount,
+    date
+  };
 
+  const transactions = [...getTransactions(), newTransaction];
+  saveTransactions(transactions);
   form.reset();
   renderTransactions();
-});
+}
+
+if (form) {
+  form.addEventListener("submit", handleSubmit);
+}
 
 renderTransactions();
