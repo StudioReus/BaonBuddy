@@ -2,6 +2,8 @@
   box-sizing: border-box;
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Gorditas:wght@400;700&display=swap');
+
 :root {
   --bg: #f4f7ff;
   --bg-accent: #eef4ff;
@@ -57,6 +59,8 @@ body.app-ready .app {
 }
 
 .page-header h1 {
+  font-family: "Gorditas", serif;
+  font-weight: 400;
   margin: 0;
   font-size: clamp(2.5rem, 4vw, 4rem);
   letter-spacing: -0.06em;
