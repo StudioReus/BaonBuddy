@@ -224,3 +224,57 @@ if (form) {
 }
 
 renderTransactions();
+
+const form = document.getElementById("transaction-form");
+const transactionList = document.getElementById("transaction-list");
+
+let transactions = JSON.parse(localStorage.getItem("baonbuddy-transactions")) || [];
+
+function saveTransactions() {
+  localStorage.setItem("baonbuddy-transactions", JSON.stringify(transactions));
+}
+
+function renderTransactions() {
+  transactionList.innerHTML = "";
+
+  transactions.forEach((item) => {
+    const li = document.createElement("li");
+    li.textContent = `${item.type} | ${item.category} | ₱${Number(item.amount).toFixed(2)} | ${item.date}`;
+    transactionList.appendChild(li);
+  });
+}
+
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  const type = document.getElementById("type").value;
+  const category = document.getElementById("category").value;
+  const amount = Number(document.getElementById("amount").value);
+  const date = document.getElementById("date").value;
+
+  transactions.push({ type, category, amount, date });
+  saveTransactions();
+  renderTransactions();
+  form.reset();
+
+  calculateTotals();
+});
+
+function calculateTotals() {
+  const totalIncome = transactions
+    .filter(item => item.type === "income")
+    .reduce((sum, item) => sum + Number(item.amount), 0);
+
+  const totalExpenses = transactions
+    .filter(item => item.type === "expense")
+    .reduce((sum, item) => sum + Number(item.amount), 0);
+
+  const balance = totalIncome - totalExpenses;
+
+  document.getElementById("total-income").textContent = `₱${totalIncome.toFixed(2)}`;
+  document.getElementById("total-expenses").textContent = `₱${totalExpenses.toFixed(2)}`;
+  document.getElementById("remaining-balance").textContent = `₱${balance.toFixed(2)}`;
+}
+
+renderTransactions();
+calculateTotals();
