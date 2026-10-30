@@ -7,6 +7,12 @@ body {
   color: #1f2937;
 }
 
+h1 {
+  font-family: "Gorditas", serif;
+  font-weight: 400;
+  color: #1f2937;
+}
+
 .app {
   max-width: 960px;
   margin: 40px auto;
