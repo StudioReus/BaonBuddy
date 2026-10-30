@@ -3,6 +3,7 @@ const list = document.getElementById("transaction-list");
 const incomeEl = document.getElementById("total-income");
 const expensesEl = document.getElementById("total-expenses");
 const balanceEl = document.getElementById("remaining-balance");
+const downloadBtn = document.getElementById("download-csv");
 
 const STORAGE_KEY = "budget-transactions";
 
@@ -54,19 +55,13 @@ function getTransactions() {
       .map(normalizeTransaction)
       .filter(Boolean);
 
-    if (validTransactions.length > 0) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(validTransactions));
-      return validTransactions;
-    }
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
-    return [];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(validTransactions));
+    return validTransactions;
   } catch (error) {
     console.warn("Could not read saved transactions. Resetting to empty state.", error);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+    return [];
   }
-
-  localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
-  return [];
 }
 
 function saveTransactions(transactions) {
@@ -155,8 +150,8 @@ function createTransactionItem(transaction) {
   const removeButton = document.createElement("button");
   removeButton.type = "button";
   removeButton.className = "delete-button";
-  removeButton.setAttribute("aria-label", `Delete ${transaction.category}`);
   removeButton.textContent = "Delete";
+  removeButton.setAttribute("aria-label", `Delete ${transaction.category}`);
   removeButton.addEventListener("click", () => {
     const transactions = getTransactions().filter((entry) => entry.id !== transaction.id);
     saveTransactions(transactions);
@@ -223,58 +218,30 @@ if (form) {
   form.addEventListener("submit", handleSubmit);
 }
 
-renderTransactions();
+if (downloadBtn) {
+  downloadBtn.addEventListener("click", () => {
+    const transactions = getTransactions();
 
-const form = document.getElementById("transaction-form");
-const transactionList = document.getElementById("transaction-list");
+    if (!transactions.length) {
+      alert("No transactions yet. Add one first.");
+      return;
+    }
 
-let transactions = JSON.parse(localStorage.getItem("baonbuddy-transactions")) || [];
+    const rows = [["Type", "Category", "Amount", "Date"]];
 
-function saveTransactions() {
-  localStorage.setItem("baonbuddy-transactions", JSON.stringify(transactions));
-}
+    transactions.forEach((transaction) => {
+      rows.push([transaction.type, transaction.category, transaction.amount, transaction.date]);
+    });
 
-function renderTransactions() {
-  transactionList.innerHTML = "";
-
-  transactions.forEach((item) => {
-    const li = document.createElement("li");
-    li.textContent = `${item.type} | ${item.category} | ₱${Number(item.amount).toFixed(2)} | ${item.date}`;
-    transactionList.appendChild(li);
+    const csv = rows.map((row) => row.join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "student-expense-tracker.csv";
+    link.click();
+    URL.revokeObjectURL(url);
   });
 }
 
-form.addEventListener("submit", (event) => {
-  event.preventDefault();
-
-  const type = document.getElementById("type").value;
-  const category = document.getElementById("category").value;
-  const amount = Number(document.getElementById("amount").value);
-  const date = document.getElementById("date").value;
-
-  transactions.push({ type, category, amount, date });
-  saveTransactions();
-  renderTransactions();
-  form.reset();
-
-  calculateTotals();
-});
-
-function calculateTotals() {
-  const totalIncome = transactions
-    .filter(item => item.type === "income")
-    .reduce((sum, item) => sum + Number(item.amount), 0);
-
-  const totalExpenses = transactions
-    .filter(item => item.type === "expense")
-    .reduce((sum, item) => sum + Number(item.amount), 0);
-
-  const balance = totalIncome - totalExpenses;
-
-  document.getElementById("total-income").textContent = `₱${totalIncome.toFixed(2)}`;
-  document.getElementById("total-expenses").textContent = `₱${totalExpenses.toFixed(2)}`;
-  document.getElementById("remaining-balance").textContent = `₱${balance.toFixed(2)}`;
-}
-
 renderTransactions();
-calculateTotals();
