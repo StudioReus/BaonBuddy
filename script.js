@@ -23,7 +23,7 @@ function getTransactions() {
   }
 
   localStorage.setItem(storageKey, JSON.stringify(defaultTransactions));
-  return defaultTransactions;
+  return [...defaultTransactions];
 }
 
 function saveTransactions(transactions) {
@@ -76,7 +76,7 @@ function renderTransactions() {
     const item = document.createElement("li");
 
     const label = document.createElement("span");
-    label.textContent = `${transaction.category}`;
+    label.textContent = transaction.category;
 
     const amount = document.createElement("span");
     amount.classList.add(
@@ -103,12 +103,12 @@ form.addEventListener("submit", function (event) {
     date: document.getElementById("date").value
   };
 
-  if (!transaction.category || !transaction.amount || !transaction.date) {
-    alert("Please fill out all fields.");
+  if (!transaction.category || !transaction.amount || transaction.amount <= 0 || !transaction.date) {
+    alert("Please fill out all fields with a valid amount.");
     return;
   }
 
-  const transactions = getTransactions();
+  const transactions = [...getTransactions()];
   transactions.push(transaction);
   saveTransactions(transactions);
 
