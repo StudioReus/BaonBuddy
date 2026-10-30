@@ -162,3 +162,45 @@ li {
     align-items: flex-start;
   }
 }
+
+.guides,
+.tips,
+.download-section {
+  margin-top: 2rem;
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+.guide-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.guide-card {
+  background: #f7f9ff;
+  border: 1px solid #dfe8ff;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.tips ul {
+  margin-left: 1.2rem;
+  line-height: 1.8;
+}
+
+.download-section button {
+  background: #2f6fed;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.2rem;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.download-section button:hover {
+  background: #2559c7;
+}
