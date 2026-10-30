@@ -5,10 +5,19 @@ const expensesEl = document.getElementById("total-expenses");
 const balanceEl = document.getElementById("remaining-balance");
 
 const STORAGE_KEY = "budget-transactions";
+
+function createId() {
+  if (window.crypto && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+
+  return `tx-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
 const DEFAULT_TRANSACTIONS = [
-  { id: crypto.randomUUID(), type: "income", category: "Salary", amount: 2500, date: "2026-10-01" },
-  { id: crypto.randomUUID(), type: "expense", category: "Groceries", amount: 120.5, date: "2026-10-02" },
-  { id: crypto.randomUUID(), type: "expense", category: "Rent", amount: 900, date: "2026-10-03" }
+  { id: createId(), type: "income", category: "Salary", amount: 2500, date: "2026-10-01" },
+  { id: createId(), type: "expense", category: "Groceries", amount: 120.5, date: "2026-10-02" },
+  { id: createId(), type: "expense", category: "Rent", amount: 900, date: "2026-10-03" }
 ];
 
 function safeNumber(value) {
@@ -31,7 +40,7 @@ function normalizeTransaction(rawTransaction = {}) {
   }
 
   return {
-    id: rawTransaction.id || crypto.randomUUID(),
+    id: rawTransaction.id || createId(),
     type,
     category,
     amount,
@@ -101,10 +110,12 @@ function updateSummary() {
   const transactions = getTransactions();
   const { totalIncome, totalExpenses, balance } = getSummary(transactions);
 
-  incomeEl.textContent = formatMoney(totalIncome);
-  expensesEl.textContent = formatMoney(totalExpenses);
-  balanceEl.textContent = formatMoney(balance);
-  balanceEl.style.color = balance >= 0 ? "#16a34a" : "#dc2626";
+  if (incomeEl) incomeEl.textContent = formatMoney(totalIncome);
+  if (expensesEl) expensesEl.textContent = formatMoney(totalExpenses);
+  if (balanceEl) {
+    balanceEl.textContent = formatMoney(balance);
+    balanceEl.style.color = balance >= 0 ? "#16a34a" : "#dc2626";
+  }
 }
 
 function formatDate(dateString) {
@@ -198,7 +209,7 @@ function handleSubmit(event) {
   }
 
   const newTransaction = {
-    id: crypto.randomUUID(),
+    id: createId(),
     type: type === "income" ? "income" : "expense",
     category,
     amount,
