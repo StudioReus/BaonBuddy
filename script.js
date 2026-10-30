@@ -111,7 +111,7 @@ function updateSummary() {
   if (expensesEl) expensesEl.textContent = formatMoney(totalExpenses);
   if (balanceEl) {
     balanceEl.textContent = formatMoney(balance);
-    balanceEl.style.color = balance >= 0 ? "#16a34a" : "#dc2626";
+    balanceEl.style.color = balance >= 0 ? "#39c38d" : "#ff6c7e";
   }
 }
 
@@ -150,7 +150,7 @@ function createTransactionItem(transaction) {
 
   const amount = document.createElement("span");
   amount.className = `amount ${transaction.type === "income" ? "income" : "expense"}`;
-  amount.textContent = `${transaction.type === "income" ? "+" : "-"}${formatMoney(transaction.amount)}`;
+  amount.textContent = `${transaction.type === "income" ? "+" : "-" }${formatMoney(transaction.amount)}`;
 
   const removeButton = document.createElement("button");
   removeButton.type = "button";
@@ -224,20 +224,6 @@ if (form) {
 }
 
 renderTransactions();
-
-const startupScreen = document.getElementById("startup-screen");
-const appBody = document.body;
-
-if (startupScreen) {
-  window.addEventListener("load", () => {
-    setTimeout(() => {
-      startupScreen.classList.add("hidden");
-      appBody.classList.add("app-ready");
-    }, 1700);
-  });
-} else {
-  appBody.classList.add("app-ready");
-}
 
 const startupScreen = document.getElementById("startup-screen");
 const appBody = document.body;
