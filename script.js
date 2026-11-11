@@ -4,14 +4,14 @@ const incomeEl = document.getElementById("total-income");
 const expensesEl = document.getElementById("total-expenses");
 const balanceEl = document.getElementById("remaining-balance");
 const downloadButton = document.getElementById("download-csv");
-
+const recurringToggle = document.getElementById("is-recurring");
+const recurringOptions = document.getElementById("recurring-options");
 const STORAGE_KEY = "budget-transactions";
 
 function createId() {
-  if (window.crypto && typeof crypto.randomUUID === "function") {
-    return crypto.randomUUID();
+  if (window.crypto && typeof window.crypto.randomUUID === "function") {
+    return window.crypto.randomUUID();
   }
-
   return `tx-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
@@ -20,61 +20,48 @@ function safeNumber(value) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-function normalizeTransaction(rawTransaction = {}) {
-  if (!rawTransaction || typeof rawTransaction !== "object") {
-    return null;
-  }
+function normalizeTransaction(raw = {}) {
+  if (!raw || typeof raw !== "object") return null;
 
-  const type = rawTransaction.type === "income" ? "income" : "expense";
-  const category = typeof rawTransaction.category === "string" ? rawTransaction.category.trim() : "";
-  const amount = safeNumber(rawTransaction.amount);
-  const date = typeof rawTransaction.date === "string" ? rawTransaction.date : "";
+  const type = raw.type === "income" ? "income" : "expense";
+  const category = typeof raw.category === "string" ? raw.category.trim() : "";
+  const amount = safeNumber(raw.amount);
+  const date = typeof raw.date === "string" ? raw.date : "";
+  const frequency = ["weekly", "monthly", "yearly"].includes(raw.frequency) ? raw.frequency : "monthly";
 
-  if (!category || !date || amount <= 0) {
-    return null;
-  }
+  if (!category || !date || amount <= 0) return null;
 
   return {
-    id: rawTransaction.id || createId(),
+    id: raw.id || createId(),
     type,
     category,
     amount,
-    date
+    date,
+    recurring: raw.recurring === true,
+    frequency
   };
 }
 
 function getTransactions() {
   try {
-    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
-
-    if (!Array.isArray(stored)) {
-      throw new Error("Stored data is not an array");
-    }
-
-    const validTransactions = stored
-      .map(normalizeTransaction)
-      .filter(Boolean);
-
-    if (validTransactions.length > 0) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(validTransactions));
-      return validTransactions;
-    }
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
-    return [];
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    if (!Array.isArray(stored)) throw new Error("Stored data is not an array");
+    const validTransactions = stored.map(normalizeTransaction).filter(Boolean);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(validTransactions));
+    return validTransactions;
   } catch (error) {
     console.warn("Could not read saved transactions. Resetting to empty state.", error);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+    } catch (storageError) {
+      console.warn("Could not reset saved transactions.", storageError);
+    }
+    return [];
   }
-
-  localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
-  return [];
 }
 
 function saveTransactions(transactions) {
-  const safeTransactions = transactions
-    .map(normalizeTransaction)
-    .filter(Boolean);
-
+  const safeTransactions = transactions.map(normalizeTransaction).filter(Boolean);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(safeTransactions));
   return safeTransactions;
 }
@@ -88,80 +75,51 @@ function formatMoney(value) {
   }).format(safeNumber(value));
 }
 
-function getSummary(transactions) {
-  const totalIncome = transactions
-    .filter((transaction) => transaction.type === "income")
-    .reduce((sum, transaction) => sum + safeNumber(transaction.amount), 0);
-
-  const totalExpenses = transactions
-    .filter((transaction) => transaction.type === "expense")
-    .reduce((sum, transaction) => sum + safeNumber(transaction.amount), 0);
-
-  return {
-    totalIncome,
-    totalExpenses,
-    balance: totalIncome - totalExpenses
-  };
-}
-
 function updateSummary() {
   const transactions = getTransactions();
-  const { totalIncome, totalExpenses, balance } = getSummary(transactions);
+  const totalIncome = transactions
+    .filter((transaction) => transaction.type === "income")
+    .reduce((sum, transaction) => sum + transaction.amount, 0);
+  const totalExpenses = transactions
+    .filter((transaction) => transaction.type === "expense")
+    .reduce((sum, transaction) => sum + transaction.amount, 0);
+  const balance = totalIncome - totalExpenses;
 
   if (incomeEl) incomeEl.textContent = formatMoney(totalIncome);
   if (expensesEl) expensesEl.textContent = formatMoney(totalExpenses);
   if (balanceEl) {
     balanceEl.textContent = formatMoney(balance);
-    balanceEl.style.color = balance >= 0 ? "#39c38d" : "#ff6c7e";
+    balanceEl.classList.toggle("negative", balance < 0);
   }
 }
 
 function formatDate(dateString) {
   if (!dateString) return "No date";
-
-  const date = new Date(dateString + "T00:00:00");
-
-  if (Number.isNaN(date.getTime())) {
-    return dateString;
-  }
-
-  return new Intl.DateTimeFormat("en-PH", {
-    year: "numeric",
-    month: "short",
-    day: "numeric"
-  }).format(date);
+  const date = new Date(`${dateString}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return dateString;
+  return new Intl.DateTimeFormat("en-PH", { year: "numeric", month: "short", day: "numeric" }).format(date);
 }
 
 function escapeCsvCell(value) {
   const text = String(value ?? "");
-
-  if (/[",\n\r]/.test(text)) {
-    return `"${text.replace(/"/g, '""')}"`;
-  }
-
-  return text;
+  return /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 }
 
 function downloadTransactionsCsv() {
   const transactions = getTransactions();
   const rows = [
-    ["Type", "Category", "Amount", "Date"],
+    ["Type", "Category", "Amount", "Date", "Recurring", "Frequency"],
     ...transactions.map((transaction) => [
       transaction.type,
       transaction.category,
-      Number(transaction.amount).toFixed(2),
-      transaction.date
+      transaction.amount.toFixed(2),
+      transaction.date,
+      transaction.recurring ? "Yes" : "No",
+      transaction.recurring ? transaction.frequency : ""
     ])
   ];
-
-  const csvContent = rows
-    .map((row) => row.map(escapeCsvCell).join(","))
-    .join("\n");
-
-  const blob = new Blob([csvContent], {
-    type: "text/csv;charset=utf-8;"
-  });
-
+  const csvContent = rows.map((row) => row.map(escapeCsvCell).join(",")).join("\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
@@ -176,148 +134,97 @@ function createTransactionItem(transaction) {
   const item = document.createElement("li");
   item.className = "transaction-item";
 
+  const icon = document.createElement("span");
+  icon.className = `transaction-icon ${transaction.type}`;
+  icon.setAttribute("aria-hidden", "true");
+  icon.textContent = transaction.type === "income" ? "↗" : "↘";
+
   const details = document.createElement("div");
   details.className = "transaction-details";
-
   const category = document.createElement("span");
   category.className = "transaction-category";
   category.textContent = transaction.category;
-
-  const date = document.createElement("small");
-  date.className = "transaction-date";
-  date.textContent = formatDate(transaction.date);
-
-  details.append(category, date);
+  const meta = document.createElement("small");
+  meta.className = "transaction-date";
+  meta.textContent = `${formatDate(transaction.date)}${transaction.recurring ? ` · ${transaction.frequency}` : ""}`;
+  details.append(category, meta);
 
   const amount = document.createElement("span");
-  amount.className = `amount ${transaction.type === "income" ? "income" : "expense"}`;
-  amount.textContent = `${transaction.type === "income" ? "+" : "-"}${formatMoney(transaction.amount)}`;
+  amount.className = `amount ${transaction.type}`;
+  amount.textContent = `${transaction.type === "income" ? "+" : "−"}${formatMoney(transaction.amount)}`;
 
   const removeButton = document.createElement("button");
   removeButton.type = "button";
   removeButton.className = "delete-button";
   removeButton.setAttribute("aria-label", `Delete ${transaction.category}`);
-  removeButton.textContent = "Delete";
+  removeButton.textContent = "×";
   removeButton.addEventListener("click", () => {
-    const transactions = getTransactions().filter((entry) => entry.id !== transaction.id);
-    saveTransactions(transactions);
+    saveTransactions(getTransactions().filter((entry) => entry.id !== transaction.id));
     renderTransactions();
   });
 
-  item.append(details, amount, removeButton);
+  item.append(icon, details, amount, removeButton);
   return item;
 }
 
 function renderTransactions() {
   if (!list) return;
-
   const transactions = getTransactions();
-  list.innerHTML = "";
+  list.replaceChildren();
 
   if (!transactions.length) {
     const empty = document.createElement("li");
     empty.className = "empty-state";
-    empty.textContent = "No transactions yet.";
+    empty.innerHTML = '<span class="empty-icon" aria-hidden="true">✦</span><strong>Your story starts here</strong><span>Add your first transaction and watch your progress grow.</span>';
     list.appendChild(empty);
-    updateSummary();
-    return;
+  } else {
+    transactions.slice().reverse().forEach((transaction) => list.appendChild(createTransactionItem(transaction)));
   }
-
-  transactions.forEach((transaction) => {
-    list.appendChild(createTransactionItem(transaction));
-  });
-
   updateSummary();
 }
 
 function handleSubmit(event) {
   event.preventDefault();
-
   if (!form) return;
 
   const type = document.getElementById("type")?.value || "expense";
   const category = document.getElementById("category")?.value.trim() || "";
-  const amountValue = document.getElementById("amount")?.value;
+  const amount = safeNumber(document.getElementById("amount")?.value);
   const date = document.getElementById("date")?.value || "";
-  const amount = safeNumber(amountValue);
 
   if (!category || !date || amount <= 0) {
-    alert("Please fill out all fields with a valid amount.");
+    alert("Please add a category, date, and amount greater than zero.");
     return;
   }
 
-  const newTransaction = {
+  const transaction = {
     id: createId(),
     type: type === "income" ? "income" : "expense",
     category,
     amount,
-    date
+    date,
+    recurring: Boolean(recurringToggle?.checked),
+    frequency: document.getElementById("frequency")?.value || "monthly"
   };
 
-  const transactions = [...getTransactions(), newTransaction];
-  saveTransactions(transactions);
+  saveTransactions([...getTransactions(), transaction]);
   form.reset();
+  if (recurringOptions) recurringOptions.classList.add("hidden");
   renderTransactions();
+  document.getElementById("category")?.focus();
 }
 
-if (form) {
-  form.addEventListener("submit", handleSubmit);
+if (form) form.addEventListener("submit", handleSubmit);
+if (downloadButton) downloadButton.addEventListener("click", downloadTransactionsCsv);
+if (recurringToggle && recurringOptions) {
+  recurringToggle.addEventListener("change", () => recurringOptions.classList.toggle("hidden", !recurringToggle.checked));
 }
 
-if (downloadButton) {
-  downloadButton.addEventListener("click", downloadTransactionsCsv);
-}
-
+const dateInput = document.getElementById("date");
+if (dateInput && !dateInput.value) dateInput.value = new Date().toISOString().slice(0, 10);
 renderTransactions();
 
 const startupScreen = document.getElementById("startup-screen");
-const appBody = document.body;
-
 window.addEventListener("load", () => {
-  setTimeout(() => {
-    if (startupScreen) {
-      startupScreen.classList.add("hidden");
-    }
-    appBody.classList.add("app-ready");
-  }, 1700);
+  window.setTimeout(() => startupScreen?.classList.add("hidden"), 500);
 });
-
-const orb1 = document.querySelector('.orb-1');
-const orb2 = document.querySelector('.orb-2');
-
-window.addEventListener('pointermove', (event) => {
-  const x = (event.clientX / window.innerWidth - 0.5) * 30;
-  const y = (event.clientY / window.innerHeight - 0.5) * 30;
-
-  orb1.style.transform = `translate(${x}px, ${y}px) scale(1.08)`;
-  orb2.style.transform = `translate(${x * -0.7}px, ${y * -0.7}px) scale(1.06)`;
-});
-
-const isRecurring = document.getElementById("is-recurring");
-const recurringOptions = document.getElementById("recurring-options");
-
-if (isRecurring) {
-  isRecurring.addEventListener("change", () => {
-    recurringOptions.classList.toggle("hidden", !isRecurring.checked);
-  });
-}
-
-const recurring = document.getElementById("is-recurring")?.checked || false;
-const frequency = document.getElementById("frequency")?.value || "monthly";
-
-const newTransaction = {
-  id: createId(),
-  type: type === "income" ? "income" : "expense",
-  category,
-  amount,
-  date,
-  recurring,
-  frequency
-};
-
-if (transaction.recurring) {
-  const badge = document.createElement("span");
-  badge.className = "recurring-badge";
-  badge.textContent = transaction.frequency;
-  details.appendChild(badge);
-}
