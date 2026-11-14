@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#fffaf5" />
+    <title>Chat with BaonBuddy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+      :root { color-scheme: light; font-family: Nunito, sans-serif; color: #3d2a24; background: #fffaf5; }
+      * { box-sizing: border-box; }
+      body { min-height: 100vh; margin: 0; padding: 24px 16px; }
+      main { width: min(100%, 720px); margin: 0 auto; }
+      a { color: #a9521d; font-weight: 800; text-decoration: none; }
+      header { margin-bottom: 18px; }
+      h1 { margin: 6px 0; font-size: clamp(1.7rem, 5vw, 2.4rem); }
+      header p { margin: 0; color: #80685b; }
+      .card { overflow: hidden; border: 1px solid #f0e5dc; border-radius: 20px; background: #fff; box-shadow: 0 12px 30px #68422d14; }
+      #messages { display: flex; min-height: 320px; max-height: 58vh; flex-direction: column; gap: 12px; overflow-y: auto; padding: 20px; }
+      .bubble { max-width: 88%; padding: 12px 15px; border-radius: 16px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+      .assistant { align-self: flex-start; background: #fff0df; }
+      .user { align-self: flex-end; background: #f8d76c; }
+      #chat-form { display: flex; gap: 10px; padding: 14px; border-top: 1px solid #f0e5dc; }
+      #message { min-width: 0; flex: 1; padding: 12px 14px; border: 1px solid #e8d9cd; border-radius: 12px; font: inherit; }
+      #message:focus { border-color: #d97732; outline: 3px solid #d9773226; }
+      button { padding: 10px 18px; border: 0; border-radius: 12px; background: #f29a55; color: white; font: inherit; font-weight: 900; cursor: pointer; }
+      button:disabled { cursor: wait; opacity: .65; }
+      #status { min-height: 1.5em; padding: 0 18px 12px; color: #80685b; font-size: .9rem; }
+      .note { margin: 12px 4px; color: #80685b; font-size: .85rem; }
+      @media (max-width: 480px) { body { padding: 16px 10px; } #messages { min-height: 50vh; padding: 14px; } #chat-form { padding: 10px; } button { padding-inline: 14px; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <a href="/">← Back to BaonBuddy</a>
+        <h1>Chat with BaonBuddy ✦</h1>
+        <p>Ask for friendly ideas to plan your allowance, spending, or savings.</p>
+      </header>
+      <section class="card" aria-label="BaonBuddy chat">
+        <div id="messages" role="log" aria-live="polite" aria-relevant="additions">
+          <div class="bubble assistant">Hi! I’m your money buddy. What would you like help planning?</div>
+        </div>
+        <form id="chat-form">
+          <label for="message" hidden>Your message</label>
+          <input id="message" name="message" type="text" maxlength="2000" placeholder="Type your message…" autocomplete="off" required />
+          <button id="send" type="submit">Send</button>
+        </form>
+        <div id="status" role="status" aria-live="polite"></div>
+      </section>
+      <p class="note">AI replies are general information, not professional financial advice. Don’t share passwords or account details.</p>
+    </main>
+    <script>
+      const form = document.getElementById("chat-form");
+      const input = document.getElementById("message");
+      const messages = document.getElementById("messages");
+      const status = document.getElementById("status");
+      const send = document.getElementById("send");
+      const history = [];
+
+      function addBubble(text, role) {
+        const bubble = document.createElement("div");
+        bubble.className = `bubble ${role}`;
+        bubble.textContent = text;
+        messages.appendChild(bubble);
+        messages.scrollTop = messages.scrollHeight;
+        return bubble;
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const message = input.value.trim();
+        if (!message || send.disabled) return;
+
+        addBubble(message, "user");
+        input.value = "";
+        input.disabled = true;
+        send.disabled = true;
+        status.textContent = "BaonBuddy is thinking…";
+        const pending = addBubble("Thinking…", "assistant");
+
+        try {
+          const response = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message, history }),
+          });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || "The chat request failed.");
+
+          pending.textContent = data.response;
+          history.push({ role: "user", text: message }, { role: "model", text: data.response });
+          if (history.length > 10) history.splice(0, history.length - 10);
+          status.textContent = "";
+        } catch (error) {
+          pending.textContent = error.message || "Could not send your message. Please try again.";
+          status.textContent = "Message wasn’t sent successfully. You can try again.";
+        } finally {
+          input.disabled = false;
+          send.disabled = false;
+          input.focus();
+        }
+      });
+    </script>
+  </body>
+</html>

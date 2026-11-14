@@ -2,11 +2,14 @@
   "name": "baonbuddy-backend",
   "version": "1.0.0",
   "private": true,
-  "description": "Starter backend for BaonBuddy chat API",
+  "description": "BaonBuddy website and Gemini chat API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "dependencies": {
     "dotenv": "^16.4.7",
