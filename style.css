@@ -49,7 +49,9 @@ h1, h2, h3, .brand, .welcome h1, .startup-content h1, .page-header h1 {
 .welcome-copy { position: relative; z-index: 1; max-width: 620px; }
 .eyebrow { margin: 0 0 8px; color: var(--orange-dark); font-size: .7rem; font-weight: 900; letter-spacing: .13em; }
 .welcome h1 { margin: 0; font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 900; line-height: 1.04; letter-spacing: -.055em; }
-.welcome-copy > p:last-child { max-width: 480px; margin: 14px 0 0; color: #80685b; font-size: 1.02rem; line-height: 1.55; }
+.welcome-copy > p:nth-of-type(2) { max-width: 480px; margin: 14px 0 0; color: #80685b; font-size: 1.02rem; line-height: 1.55; }
+.chat-link { display: inline-flex; align-items: center; gap: 10px; margin-top: 18px; padding: 11px 16px; border-radius: 13px; background: var(--orange); color: white; font-weight: 900; text-decoration: none; box-shadow: 0 4px 0 var(--orange-dark); transition: transform .18s ease, box-shadow .18s ease, background .18s ease; }
+.chat-link:hover { background: #e98d47; box-shadow: 0 6px 0 var(--orange-dark); transform: translateY(-2px); }
 .welcome-buddy { position: absolute; right: 12%; bottom: -34px; display: grid; width: 180px; height: 180px; place-items: center; border: 11px solid rgba(255,255,255,.7); border-radius: 47% 53% 48% 52%; background: var(--yellow); transform: rotate(-8deg); box-shadow: 0 12px 0 rgba(198, 117, 55, .13); }
 .buddy-face { color: #80552e; font-size: 6rem; font-weight: 900; line-height: 1; transform: rotate(8deg); }
 .buddy-spark { position: absolute; top: 6px; right: -15px; color: var(--orange); font-size: 2.7rem; }
