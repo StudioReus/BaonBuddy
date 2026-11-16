@@ -6,7 +6,10 @@ const balanceEl = document.getElementById("remaining-balance");
 const downloadButton = document.getElementById("download-csv");
 const recurringToggle = document.getElementById("is-recurring");
 const recurringOptions = document.getElementById("recurring-options");
+const goalForm = document.getElementById("goal-form");
+const goalContributionForm = document.getElementById("goal-contribution-form");
 const STORAGE_KEY = "budget-transactions";
+const GOAL_STORAGE_KEY = "baonbuddy-savings-goal";
 
 function createId() {
   if (window.crypto && typeof window.crypto.randomUUID === "function") {
@@ -73,6 +76,69 @@ function formatMoney(value) {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   }).format(safeNumber(value));
+}
+
+function getGoal() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(GOAL_STORAGE_KEY) || "null");
+    if (!raw || typeof raw !== "object") return null;
+    const name = typeof raw.name === "string" ? raw.name.trim().slice(0, 60) : "";
+    const target = safeNumber(raw.target);
+    const saved = Math.max(0, safeNumber(raw.saved));
+    return name && target > 0 ? { name, target, saved } : null;
+  } catch (error) {
+    console.warn("Could not read the saved goal.", error);
+    return null;
+  }
+}
+
+function saveGoal(goal) {
+  try {
+    if (goal) localStorage.setItem(GOAL_STORAGE_KEY, JSON.stringify(goal));
+    else localStorage.removeItem(GOAL_STORAGE_KEY);
+    return true;
+  } catch (error) {
+    console.warn("Could not save your goal.", error);
+    alert("Your browser couldn’t save this goal. Check that local storage is available and try again.");
+    return false;
+  }
+}
+
+function renderGoal() {
+  const goal = getGoal();
+  const empty = document.getElementById("goal-empty");
+  const view = document.getElementById("goal-progress-view");
+  const formHeading = document.getElementById("goal-form-heading");
+  const saveLabel = document.getElementById("goal-save-label");
+  const clearButton = document.getElementById("goal-clear");
+  if (!empty || !view) return;
+
+  empty.hidden = Boolean(goal);
+  view.hidden = !goal;
+  if (formHeading) formHeading.textContent = goal ? "Adjust your goal" : "Start a goal";
+  if (saveLabel) saveLabel.textContent = goal ? "Update my goal" : "Create my goal";
+  if (clearButton) clearButton.hidden = !goal;
+  if (!goal) return;
+
+  const percent = Math.min(100, Math.floor((goal.saved / goal.target) * 100));
+  document.getElementById("goal-name").textContent = goal.name;
+  document.getElementById("goal-percent").textContent = `${percent}%`;
+  document.getElementById("goal-saved").textContent = `${formatMoney(goal.saved)} saved`;
+  document.getElementById("goal-target").textContent = `of ${formatMoney(goal.target)}`;
+  document.getElementById("goal-message").textContent = goal.saved >= goal.target
+    ? "You did it! Your goal is complete. ✨"
+    : `${formatMoney(goal.target - goal.saved)} to go — you’ve got this!`;
+  const progress = document.getElementById("goal-progress-track");
+  progress.setAttribute("aria-valuenow", String(percent));
+  document.getElementById("goal-progress-fill").style.width = `${percent}%`;
+  const contribution = document.getElementById("goal-contribution");
+  const addButton = goalContributionForm?.querySelector("button[type='submit']");
+  if (contribution && addButton) {
+    const complete = goal.saved >= goal.target;
+    contribution.disabled = complete;
+    addButton.disabled = complete;
+    contribution.placeholder = complete ? "Goal complete!" : "Add savings";
+  }
 }
 
 function updateSummary() {
@@ -183,6 +249,49 @@ function renderTransactions() {
   updateSummary();
 }
 
+function handleGoalSubmit(event) {
+  event.preventDefault();
+  const nameInput = document.getElementById("goal-name-input");
+  const targetInput = document.getElementById("goal-target-input");
+  const name = nameInput?.value.trim() || "";
+  const target = safeNumber(targetInput?.value);
+  if (!name || target <= 0) {
+    alert("Add a goal name and a target greater than zero.");
+    return;
+  }
+  const previous = getGoal();
+  const goal = { name, target, saved: previous?.saved || 0 };
+  if (saveGoal(goal)) {
+    goalForm.reset();
+    renderGoal();
+  }
+}
+
+function handleGoalContribution(event) {
+  event.preventDefault();
+  const input = document.getElementById("goal-contribution");
+  const amount = safeNumber(input?.value);
+  const goal = getGoal();
+  if (!goal || amount <= 0) return;
+  goal.saved = Math.min(goal.target, goal.saved + amount);
+  if (saveGoal(goal)) {
+    goalContributionForm.reset();
+    renderGoal();
+  }
+}
+
+const clearGoalButton = document.getElementById("goal-clear");
+if (goalForm) goalForm.addEventListener("submit", handleGoalSubmit);
+if (goalContributionForm) goalContributionForm.addEventListener("submit", handleGoalContribution);
+if (clearGoalButton) {
+  clearGoalButton.addEventListener("click", () => {
+    if (saveGoal(null)) {
+      goalForm.reset();
+      renderGoal();
+    }
+  });
+}
+
 function handleSubmit(event) {
   event.preventDefault();
   if (!form) return;
@@ -223,6 +332,7 @@ if (recurringToggle && recurringOptions) {
 const dateInput = document.getElementById("date");
 if (dateInput && !dateInput.value) dateInput.value = new Date().toISOString().slice(0, 10);
 renderTransactions();
+renderGoal();
 
 const startupScreen = document.getElementById("startup-screen");
 window.addEventListener("load", () => {

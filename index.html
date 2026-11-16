@@ -19,6 +19,7 @@
         .welcome-buddy .buddy-face { width: 112px; height: 112px; }
       }
     </style>
+    <link rel="stylesheet" href="redesign.css" />
     <script src="script.js" defer></script>
   </head>
 
@@ -73,6 +74,46 @@
           <p id="remaining-balance">₱0.00</p>
           <span class="card-caption">Your current balance</span>
         </article>
+      </section>
+
+      <section class="goal-panel" aria-labelledby="goal-title">
+        <div class="goal-content">
+          <div class="goal-heading">
+            <div class="goal-icon" aria-hidden="true">✦</div>
+            <div>
+              <p class="eyebrow">A LITTLE SAVING GOES A LONG WAY</p>
+              <h2 id="goal-title">Your savings goal</h2>
+            </div>
+          </div>
+          <div id="goal-empty" class="goal-empty">
+            <p>Give your next money win a name and a target.</p>
+          </div>
+          <div id="goal-progress-view" class="goal-progress-view" hidden>
+            <div class="goal-progress-copy">
+              <div><h3 id="goal-name">My savings goal</h3><p id="goal-message">Every little bit counts.</p></div>
+              <strong id="goal-percent">0%</strong>
+            </div>
+            <div class="progress-track" id="goal-progress-track" role="progressbar" aria-label="Savings goal progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <div id="goal-progress-fill" class="progress-fill"></div>
+            </div>
+            <div class="goal-totals"><span id="goal-saved">₱0.00 saved</span><span id="goal-target">of ₱0.00</span></div>
+            <form id="goal-contribution-form" class="goal-contribution-form">
+              <label class="sr-only" for="goal-contribution">Amount to add to your goal</label>
+              <span aria-hidden="true">₱</span>
+              <input id="goal-contribution" name="contribution" type="number" min="0.01" step="0.01" placeholder="Add savings" required />
+              <button class="goal-add-button" type="submit">Add to goal <span aria-hidden="true">＋</span></button>
+            </form>
+          </div>
+        </div>
+        <form id="goal-form" class="goal-form">
+          <p class="goal-form-title" id="goal-form-heading">Start a goal</p>
+          <label for="goal-name-input">What are you saving for?</label>
+          <input id="goal-name-input" name="goalName" type="text" maxlength="60" placeholder="A new pair of shoes…" required />
+          <label for="goal-target-input">Savings target</label>
+          <div class="goal-target-input"><span aria-hidden="true">₱</span><input id="goal-target-input" name="target" type="number" min="0.01" step="0.01" placeholder="0.00" required /></div>
+          <button type="submit" class="goal-save-button"><span id="goal-save-label">Create my goal</span><span aria-hidden="true">→</span></button>
+          <button type="button" id="goal-clear" class="goal-clear-button" hidden>Remove goal</button>
+        </form>
       </section>
 
       <div class="main-grid">
