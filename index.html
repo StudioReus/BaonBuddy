@@ -5,17 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#fffdf7" />
     <title>BaonBuddy — Your money, one step at a time</title>
+    <link rel="icon" type="image/png" href="baonbuddy.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
+    <style>
+      .brand-logo { display: block; flex: 0 0 auto; width: 44px; height: 44px; object-fit: contain; }
+      .startup-logo { width: 96px; height: 96px; object-fit: contain; }
+      .welcome-buddy .buddy-face { display: block; width: 150px; height: 150px; object-fit: contain; }
+      @media (max-width: 600px) {
+        .brand-logo { width: 38px; height: 38px; }
+        .welcome-buddy .buddy-face { width: 112px; height: 112px; }
+      }
+    </style>
     <script src="script.js" defer></script>
   </head>
 
   <body>
     <div class="startup-screen" id="startup-screen" aria-hidden="true">
       <div class="startup-content">
-        <span class="brand-mark" aria-hidden="true">₱</span>
+        <img class="startup-logo" src="baonbuddy.png" alt="" />
         <p class="eyebrow">Your friendly money buddy</p>
         <h1>BaonBuddy</h1>
         <div class="startup-loader" aria-label="Loading"><span></span><span></span><span></span></div>
@@ -25,7 +35,7 @@
     <main class="app">
       <header class="page-header">
         <a class="brand" href="#top" aria-label="BaonBuddy home">
-          <span class="brand-mark" aria-hidden="true">₱</span>
+          <img class="brand-logo" src="baonbuddy.png" alt="" />
           <span>Baon<span>Buddy</span></span>
         </a>
         <div class="header-note"><span class="sparkle" aria-hidden="true">✦</span> Little steps add up!</div>
@@ -39,7 +49,7 @@
           <a class="chat-link" href="/chat.html">Chat with BaonBuddy <span aria-hidden="true">→</span></a>
         </div>
         <div class="welcome-buddy" aria-hidden="true">
-          <span class="buddy-face">baonbuddy.png</span>
+          <img class="buddy-face" src="baonbuddy.png" alt="" />
           <span class="buddy-spark">✦</span>
         </div>
         <div class="welcome-sticker" aria-hidden="true">You’ve got this!</div>
@@ -116,11 +126,10 @@
         </section>
       </div>
 
-        <section class="download-section" aria-labelledby="download-title">
-          <span class="download-icon" aria-hidden="true">↓</span>
-          <div><p class="eyebrow">TAKE IT WITH YOU</p><h2 id="download-title">Your records, anytime</h2><p>Download your transactions as a spreadsheet-friendly CSV.</p></div>
-          <button type="button" id="download-csv" class="secondary-button">Download CSV <span aria-hidden="true">↗</span></button>
-        </section>
+      <section class="download-section" aria-labelledby="download-title">
+        <span class="download-icon" aria-hidden="true">↓</span>
+        <div><p class="eyebrow">TAKE IT WITH YOU</p><h2 id="download-title">Your records, anytime</h2><p>Download your transactions as a spreadsheet-friendly CSV.</p></div>
+        <button type="button" id="download-csv" class="secondary-button">Download CSV <span aria-hidden="true">↗</span></button>
       </section>
       <footer class="page-footer">Made for your next little money win <span aria-hidden="true">♥</span></footer>
     </main>
