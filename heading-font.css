@@ -1,0 +1,9 @@
+/* Bring back Gorditas for the main page's display headings only. */
+body .welcome h1,
+body .goal-heading h2,
+body .goal-progress-copy h3,
+body .section-heading h2,
+body .download-section h2,
+body .startup-content h1 {
+  font-family: 'Gorditas', cursive;
+}
