@@ -1,0 +1,10 @@
+.env*
+.git/
+.gitignore
+.assetsignore
+node_modules/
+package.json
+package-lock.json
+server.js
+worker.mjs
+wrangler.toml
