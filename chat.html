@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#fffaf5" />
     <title>Chat with BaonBuddy</title>
+    <link rel="icon" type="image/png" href="/baonbuddy.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
@@ -15,6 +16,8 @@
       main { width: min(100%, 720px); margin: 0 auto; }
       a { color: #a9521d; font-weight: 800; text-decoration: none; }
       header { margin-bottom: 18px; }
+      .brand-home { display: inline-flex; align-items: center; gap: 9px; }
+      .brand-home img { width: 40px; height: 40px; object-fit: contain; }
       h1 { margin: 6px 0; font-size: clamp(1.7rem, 5vw, 2.4rem); }
       header p { margin: 0; color: #80685b; }
       .card { overflow: hidden; border: 1px solid #f0e5dc; border-radius: 20px; background: #fff; box-shadow: 0 12px 30px #68422d14; }
@@ -35,7 +38,7 @@
   <body>
     <main>
       <header>
-        <a href="/">← Back to BaonBuddy</a>
+        <a class="brand-home" href="/" aria-label="Back to BaonBuddy home"><img src="/baonbuddy.png" alt="" /><span>← Back to BaonBuddy</span></a>
         <h1>Chat with BaonBuddy ✦</h1>
         <p>Ask for friendly ideas to plan your allowance, spending, or savings.</p>
       </header>
