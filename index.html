@@ -3,7 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#fffdf7" />
+    <meta name="theme-color" content="#fff8ef" />
+    <meta name="description" content="A bright, friendly place to keep track of your baon." />
     <title>BaonBuddy — Your money, one step at a time</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -16,7 +17,7 @@
     <div class="startup-screen" id="startup-screen" aria-hidden="true">
       <div class="startup-content">
         <span class="brand-mark" aria-hidden="true">₱</span>
-        <p class="eyebrow">Your friendly money buddy</p>
+        <p class="eyebrow">YOUR FRIENDLY MONEY BUDDY</p>
         <h1>BaonBuddy</h1>
         <div class="startup-loader" aria-label="Loading"><span></span><span></span><span></span></div>
       </div>
@@ -69,7 +70,7 @@
       <div class="main-grid">
         <section class="panel entry-form" aria-labelledby="add-title">
           <div class="section-heading">
-            <div><p class="eyebrow">KEEP YOUR TRACKER UP TO DATE</p><h2 id="add-title">Add a transaction</h2></div>
+            <div><p class="eyebrow">A LITTLE LOG GOES A LONG WAY</p><h2 id="add-title">Add a transaction</h2></div>
             <span class="heading-icon" aria-hidden="true">＋</span>
           </div>
           <form id="transaction-form">
@@ -109,39 +110,17 @@
 
         <section class="panel history" aria-labelledby="history-title">
           <div class="section-heading">
-            <div><p class="eyebrow">EVERY LITTLE THING COUNTS</p><h2 id="history-title">Recent transactions</h2></div>
+            <div><p class="eyebrow">YOUR LATEST MONEY MOVES</p><h2 id="history-title">Recent transactions</h2></div>
             <span class="heading-icon" aria-hidden="true">☷</span>
           </div>
           <ul id="transaction-list" aria-live="polite"></ul>
         </section>
       </div>
 
-      <section class="panel guides" aria-labelledby="guide-title">
-        <div class="section-heading">
-          <div><p class="eyebrow">A FEW FRIENDLY POINTERS</p><h2 id="guide-title">Build money-smarter habits</h2></div>
-          <span class="heading-icon" aria-hidden="true">✧</span>
-        </div>
-        <div class="guide-grid">
-          <article class="guide-card guide-peach"><span class="guide-number">01</span><h3>Try the 50/30/20 rule</h3><p>Think of 50% for needs, 30% for wants, and 20% for savings. Adjust it to fit your life.</p></article>
-          <article class="guide-card guide-mint"><span class="guide-number">02</span><h3>Make a weekly plan</h3><p>Split your allowance into food, transport, school needs, and a little emergency buffer.</p></article>
-          <article class="guide-card guide-lilac"><span class="guide-number">03</span><h3>Save a little first</h3><p>Set aside a small amount before spending. Small, steady savings are worth celebrating.</p></article>
-        </div>
-      </section>
-
-      <section class="bottom-grid">
-        <section class="panel tips" aria-labelledby="tips-title">
-          <p class="eyebrow">SMALL WINS</p><h2 id="tips-title">Easy ways to save</h2>
-          <ul>
-            <li>Log your spending as you go.</li>
-            <li>Set a weekly goal that feels doable.</li>
-            <li>Keep a little aside for surprises.</li>
-          </ul>
-        </section>
-        <section class="download-section" aria-labelledby="download-title">
-          <span class="download-icon" aria-hidden="true">↓</span>
-          <div><p class="eyebrow">TAKE IT WITH YOU</p><h2 id="download-title">Your records, anytime</h2><p>Download your transactions as a spreadsheet-friendly CSV.</p></div>
-          <button type="button" id="download-csv" class="secondary-button">Download CSV <span aria-hidden="true">↗</span></button>
-        </section>
+      <section class="download-section" aria-labelledby="download-title">
+        <span class="download-icon" aria-hidden="true">↓</span>
+        <div><p class="eyebrow">YOURS TO KEEP</p><h2 id="download-title">Take your records with you</h2><p>Download your transactions as a spreadsheet-friendly CSV.</p></div>
+        <button type="button" id="download-csv" class="secondary-button">Download CSV <span aria-hidden="true">↗</span></button>
       </section>
       <footer class="page-footer">Made for your next little money win <span aria-hidden="true">♥</span></footer>
     </main>
