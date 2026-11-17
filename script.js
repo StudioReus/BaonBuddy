@@ -339,23 +339,6 @@ window.addEventListener("load", () => {
   window.setTimeout(() => startupScreen?.classList.add("hidden"), 500);
 });
 
-{
-  points: 340,
-  currentStreak: 4,
-  bestStreak: 8,
-  dailyTasks: [
-    { id: "log-expense", title: "Log an expense", points: 25, completed: true, date: "2026-11-17" },
-    { id: "add-save", title: "Add ₱50 to your goal", points: 50, completed: false, date: "2026-11-17" }
-  ],
-  weeklyTasks: [
-    { id: "save-200", title: "Save ₱200 this week", points: 120, completed: true, weekKey: "2026-W46" },
-    { id: "budget-review", title: "Review your spending", points: 75, completed: false, weekKey: "2026-W46" }
-  ],
-  goals: [
-    { id: "g1", name: "Emergency fund", target: 5000, saved: 1250 },
-    { id: "g2", name: "New sneakers", target: 3000, saved: 800 }
-  ]
-}
 
 const QUESTS_KEY = "baonbuddy-quests";
 
