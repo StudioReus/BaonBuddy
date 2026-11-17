@@ -167,6 +167,53 @@
         </section>
       </div>
 
+      <section class="quest-panel" aria-labelledby="quest-title">
+  <div class="quest-header">
+    <div>
+      <p class="eyebrow">LEVEL UP YOUR HABITS</p>
+      <h2 id="quest-title">Your daily quests</h2>
+    </div>
+    <div class="player-score">
+      <span class="score-label">XP</span>
+      <strong id="total-points">0</strong>
+    </div>
+  </div>
+
+  <div class="streak-row">
+    <div class="streak-pill">
+      <span>🔥</span>
+      <strong id="current-streak">0 day streak</strong>
+    </div>
+    <div class="streak-pill">
+      <span>🏆</span>
+      <strong id="best-streak">Best: 0</strong>
+    </div>
+  </div>
+
+  <div class="quest-groups">
+    <div class="quest-group">
+      <h3>Daily quests</h3>
+      <ul id="daily-quests" class="quest-list"></ul>
+    </div>
+
+    <div class="quest-group">
+      <h3>Weekly quests</h3>
+      <ul id="weekly-quests" class="quest-list"></ul>
+    </div>
+  </div>
+
+  <form id="quest-form" class="quest-form">
+    <label for="new-goal-name">Add another money goal</label>
+    <input id="new-goal-name" type="text" placeholder="Emergency fund, new shoes, school budget..." />
+    <label for="new-goal-target">Target amount</label>
+    <div class="quest-target">
+      <span>₱</span>
+      <input id="new-goal-target" type="number" min="0.01" step="0.01" placeholder="0.00" />
+    </div>
+    <button type="submit" class="primary-button">Add goal</button>
+  </form>
+</section>
+
       <section class="download-section" aria-labelledby="download-title">
         <span class="download-icon" aria-hidden="true">↓</span>
         <div><p class="eyebrow">TAKE IT WITH YOU</p><h2 id="download-title">Your records, anytime</h2><p>Download your transactions as a spreadsheet-friendly CSV.</p></div>
