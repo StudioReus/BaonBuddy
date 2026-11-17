@@ -338,3 +338,151 @@ const startupScreen = document.getElementById("startup-screen");
 window.addEventListener("load", () => {
   window.setTimeout(() => startupScreen?.classList.add("hidden"), 500);
 });
+
+{
+  points: 340,
+  currentStreak: 4,
+  bestStreak: 8,
+  dailyTasks: [
+    { id: "log-expense", title: "Log an expense", points: 25, completed: true, date: "2026-11-17" },
+    { id: "add-save", title: "Add ₱50 to your goal", points: 50, completed: false, date: "2026-11-17" }
+  ],
+  weeklyTasks: [
+    { id: "save-200", title: "Save ₱200 this week", points: 120, completed: true, weekKey: "2026-W46" },
+    { id: "budget-review", title: "Review your spending", points: 75, completed: false, weekKey: "2026-W46" }
+  ],
+  goals: [
+    { id: "g1", name: "Emergency fund", target: 5000, saved: 1250 },
+    { id: "g2", name: "New sneakers", target: 3000, saved: 800 }
+  ]
+}
+
+const QUESTS_KEY = "baonbuddy-quests";
+
+function defaultQuestState() {
+  const today = new Date().toISOString().slice(0, 10);
+  const weekKey = getWeekKey(new Date());
+
+  return {
+    points: 0,
+    currentStreak: 0,
+    bestStreak: 0,
+    dailyTasks: [
+      { id: "log-transaction", title: "Log a transaction", points: 25, completed: false, date: today },
+      { id: "save-amount", title: "Add to a goal", points: 50, completed: false, date: today },
+      { id: "check-budget", title: "Review your budget", points: 25, completed: false, date: today }
+    ],
+    weeklyTasks: [
+      { id: "week-save", title: "Save ₱200 this week", points: 120, completed: false, weekKey },
+      { id: "week-review", title: "Review your spending", points: 75, completed: false, weekKey }
+    ],
+    goals: []
+  };
+}
+
+function getWeekKey(date) {
+  const d = new Date(date);
+  const yearStart = new Date(d.getFullYear(), 0, 1);
+  const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  return `${d.getFullYear()}-W${weekNo}`;
+}
+
+function getQuestState() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(QUESTS_KEY));
+    if (!raw) return defaultQuestState();
+    return { ...defaultQuestState(), ...raw };
+  } catch {
+    return defaultQuestState();
+  }
+}
+
+function saveQuestState(state) {
+  localStorage.setItem(QUESTS_KEY, JSON.stringify(state));
+}
+
+function completeQuest(type, id) {
+  const state = getQuestState();
+  const taskList = type === "daily" ? state.dailyTasks : state.weeklyTasks;
+  const task = taskList.find((entry) => entry.id === id);
+
+  if (!task || task.completed) return;
+
+  task.completed = true;
+  state.points += task.points;
+  state.currentStreak += 1;
+  state.bestStreak = Math.max(state.bestStreak, state.currentStreak);
+
+  saveQuestState(state);
+  renderQuests();
+}
+
+function refreshQuestDates() {
+  const state = getQuestState();
+  const today = new Date().toISOString().slice(0, 10);
+
+  state.dailyTasks = state.dailyTasks.map((task) => {
+    if (task.date !== today) {
+      return { ...task, completed: false, date: today };
+    }
+    return task;
+  });
+
+  const currentWeek = getWeekKey(new Date());
+  state.weeklyTasks = state.weeklyTasks.map((task) => {
+    if (task.weekKey !== currentWeek) {
+      return { ...task, completed: false, weekKey: currentWeek };
+    }
+    return task;
+  });
+
+  saveQuestState(state);
+}
+
+function getGoals() {
+  const state = getQuestState();
+  return state.goals || [];
+}
+
+function addGoal(name, target) {
+  const state = getQuestState();
+  if (!name || !target || target <= 0) return;
+
+  state.goals.push({
+    id: createId(),
+    name,
+    target,
+    saved: 0
+  });
+
+  saveQuestState(state);
+  renderGoals();
+}
+
+function renderGoals() {
+  const state = getQuestState();
+  const goalList = document.getElementById("goal-list");
+
+  if (!goalList) return;
+
+  goalList.innerHTML = "";
+  state.goals.forEach((goal) => {
+    const item = document.createElement("div");
+    item.className = "goal-card";
+    item.innerHTML = `
+      <div class="goal-top">
+        <strong>${goal.name}</strong>
+        <span>${Math.min(100, Math.round((goal.saved / goal.target) * 100))}%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" style="width:${Math.min(100, Math.round((goal.saved / goal.target) * 100))}%"></div>
+      </div>
+      <div class="goal-bottom">
+        <span>₱${goal.saved.toFixed(2)} saved</span>
+        <span>of ₱${goal.target.toFixed(2)}</span>
+      </div>
+    `;
+    goalList.appendChild(item);
+  });
+}
+
