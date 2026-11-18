@@ -13,6 +13,17 @@ const GOAL_STORAGE_KEY = "baonbuddy-savings-goal";
 const QUESTS_KEY = "baonbuddy-quests";
 const WEEKLY_SAVING_TARGET = 200;
 
+const tabButtons = document.querySelectorAll(".tab-btn");
+const tabPanels = document.querySelectorAll(".tab-panel");
+
+tabButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const target = button.dataset.tab;
+    tabButtons.forEach((btn) => btn.classList.toggle("active", btn === button));
+    tabPanels.forEach((panel) => panel.classList.toggle("active", panel.id === target));
+  });
+});
+
 function createId() {
   if (window.crypto && typeof window.crypto.randomUUID === "function") return window.crypto.randomUUID();
   return `tx-${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -160,7 +171,7 @@ function escapeCsvCell(value) {
 
 function downloadTransactionsCsv() {
   const transactions = getTransactions();
-  const rows = [["Type", "Category", "Amount", "Date", "Recurring", "Frequency"], ...transactions.map((transaction) => [transaction.type, transaction.category, transaction.amount.toFixed(2), transaction.date, transaction.recurring ? "Yes" : "No", transaction.recurring ? transaction.frequency : ""])];
+  const rows = [["Type", "Category", "Amount", "Date", "Recurring", "Frequency"], ...transactions.map((transaction) => [transaction.type, transaction.category, transaction.amount.toFixed(2), transaction.date, transaction.recurring ? "Yes" : "No", transaction.recurring ? transaction.frequency : ""])] ;
   const csvContent = rows.map((row) => row.map(escapeCsvCell).join(",")).join("\n");
   const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
@@ -179,7 +190,7 @@ function createTransactionItem(transaction) {
   const icon = document.createElement("span");
   icon.className = `transaction-icon ${transaction.type}`;
   icon.setAttribute("aria-hidden", "true");
-  icon.textContent = transaction.type === "income" ? "↗" : "���";
+  icon.textContent = transaction.type === "income" ? "↗" : "−";
   const details = document.createElement("div");
   details.className = "transaction-details";
   const category = document.createElement("span");
