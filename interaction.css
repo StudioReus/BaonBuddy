@@ -1,0 +1,26 @@
+/* Small, consistent press and hover feedback for interactive controls. */
+button,
+.chat-link {
+  transition: transform 180ms cubic-bezier(.2, .8, .2, 1),
+    box-shadow 180ms ease,
+    filter 180ms ease;
+}
+
+button:not(:disabled):not([aria-disabled="true"]):hover,
+.chat-link:hover {
+  transform: translateY(-2px) scale(1.02);
+  filter: brightness(1.04);
+}
+
+button:not(:disabled):not([aria-disabled="true"]):active,
+.chat-link:active {
+  transform: translateY(1px) scale(.97);
+  filter: brightness(.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button,
+  .chat-link {
+    transition: none;
+  }
+}

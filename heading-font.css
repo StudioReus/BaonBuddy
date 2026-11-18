@@ -1,4 +1,5 @@
-/* Bring back Gorditas for the main page's display headings only. */
+/* Bring back Gorditas for display headings and the corner brand. */
+body .page-header .brand,
 body .welcome h1,
 body .goal-heading h2,
 body .goal-progress-copy h3,
