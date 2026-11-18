@@ -1,9 +1,10 @@
-/* Small, consistent press and hover feedback for interactive controls. */
+/* Small, consistent hover and press feedback for all buttons and chat links. */
 button,
 .chat-link {
   transition: transform 180ms cubic-bezier(.2, .8, .2, 1),
     box-shadow 180ms ease,
-    filter 180ms ease;
+    filter 180ms ease,
+    background 180ms ease;
 }
 
 button:not(:disabled):not([aria-disabled="true"]):hover,
