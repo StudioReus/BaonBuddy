@@ -171,7 +171,7 @@ function escapeCsvCell(value) {
 
 function downloadTransactionsCsv() {
   const transactions = getTransactions();
-  const rows = [["Type", "Category", "Amount", "Date", "Recurring", "Frequency"], ...transactions.map((transaction) => [transaction.type, transaction.category, transaction.amount.toFixed(2), transaction.date, transaction.recurring ? "Yes" : "No", transaction.recurring ? transaction.frequency : ""])] ;
+  const rows = [["Type", "Category", "Amount", "Date", "Recurring", "Frequency"], ...transactions.map((transaction) => [transaction.type, transaction.category, transaction.amount.toFixed(2), transaction.date, transaction.recurring ? "Yes" : "No", transaction.frequency])];
   const csvContent = rows.map((row) => row.map(escapeCsvCell).join(",")).join("\n");
   const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
@@ -461,6 +461,17 @@ renderGoal();
 renderQuests();
 
 const startupScreen = document.getElementById("startup-screen");
-window.addEventListener("load", () => {
-  window.setTimeout(() => startupScreen?.classList.add("hidden"), 500);
-});
+
+function dismissStartupScreen() {
+  startupScreen?.classList.add("hidden");
+}
+
+if (document.readyState === "complete") {
+  window.setTimeout(dismissStartupScreen, 500);
+} else {
+  window.addEventListener("load", () => {
+    window.setTimeout(dismissStartupScreen, 500);
+  }, { once: true });
+}
+
+window.setTimeout(dismissStartupScreen, 3000);
