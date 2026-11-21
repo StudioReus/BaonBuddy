@@ -1,0 +1,202 @@
+/* BaonBuddy responsive layout and visual system cleanup.
+   Loaded after the original styles to centralize the visual rules without
+   disturbing the existing application behavior. */
+:root {
+  --ink: #263547;
+  --muted: #718094;
+  --orange: #e99a24;
+  --orange-dark: #a9680c;
+  --orange-soft: #fff3df;
+  --paper: #f7f8fa;
+  --white: #fff;
+  --line: #e7eaf0;
+  --shadow: 0 8px 26px rgba(38, 53, 71, .055);
+  --shadow-hover: 0 14px 34px rgba(38, 53, 71, .09);
+  --radius-card: 20px;
+  --radius-control: 12px;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Nunito', sans-serif;
+  line-height: 1.5;
+}
+button, input, select { font: inherit; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 3px solid rgba(233, 154, 36, .34);
+  outline-offset: 3px;
+}
+
+.app {
+  width: min(1180px, calc(100% - 64px));
+  padding: 22px 0 42px;
+}
+.page-header { margin-bottom: 18px; }
+.brand { font-family: 'Nunito', sans-serif; font-size: 1.32rem; }
+.header-note { padding: 8px 13px; font-size: .82rem; }
+
+/* Keep the brand welcome present, but let the useful dashboard lead. */
+.welcome {
+  min-height: 230px;
+  padding: clamp(30px, 4vw, 46px);
+  border: 1px solid #f0dfc7;
+  border-radius: 26px;
+  background: linear-gradient(112deg, #fff8eb 0%, #fff1dc 68%, #f9e4c6 100%);
+  box-shadow: none;
+}
+.welcome-copy { max-width: 620px; }
+.welcome h1 { font-family: 'Nunito', sans-serif; font-size: clamp(2.15rem, 4vw, 3.25rem); }
+.welcome-copy > p:nth-of-type(2) { max-width: 440px; font-size: .98rem; }
+.welcome-buddy { right: 9%; width: 156px; height: 156px; }
+.welcome-sticker { right: 3%; }
+
+.tab-nav {
+  gap: 5px;
+  margin: 20px 0 16px;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+}
+.tab-btn {
+  min-height: 42px;
+  border-radius: 10px;
+  color: #647487;
+  font-size: .91rem;
+}
+.tab-btn.active { background: #fff2dd; color: #8d5a12; box-shadow: none; }
+
+.dashboard { gap: 14px; margin: 16px 0 18px; }
+.card, .panel {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow);
+}
+.card {
+  min-height: 142px;
+  padding: 20px 22px;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.card:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+.panel { padding: 24px; }
+.panel:hover { box-shadow: var(--shadow); }
+.card h2 { color: #718094; font-family: 'Nunito', sans-serif; font-size: .82rem; }
+.card p { font-size: clamp(1.5rem, 2.5vw, 2.05rem); }
+.card.balance {
+  border-color: #efdbb9;
+  background: linear-gradient(135deg, #fffaf0, #fff3df);
+}
+.card.balance p { color: #945c0b; }
+.card.balance .card-icon { background: #ffebc7; }
+.card.expenses { --tint: #fff0ee; }
+.card.expenses p, .amount.expense { color: #bd6257; }
+
+.main-grid { grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr); gap: 16px; }
+.section-heading { margin-bottom: 18px; }
+.section-heading h2, .tips h2, .download-section h2,
+.goal-heading h2, .goal-progress-copy h3, .learn-header h2 {
+  font-family: 'Nunito', sans-serif;
+}
+.form-field input, .form-field select,
+.transaction-tools input, .transaction-tools select {
+  border-color: #e3e7ed;
+  border-radius: var(--radius-control);
+  background: #fbfcfd;
+}
+.primary-button, .chat-link {
+  border-radius: var(--radius-control);
+  box-shadow: 0 3px 0 #b96d0a;
+}
+.transaction-item { padding: 10px 12px; border-color: #edf0f3; }
+
+.goal-panel, .quest-panel, .learn-wrap {
+  border-color: var(--line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow);
+}
+.goal-panel { background: #fff; }
+.quest-panel { background: #fff; }
+.learn-wrap { background: #fff; }
+.quest-group { background: #fbfcfd; }
+.download-section { border-radius: 18px; }
+
+@media (min-width: 1100px) {
+  .app { padding-top: 28px; }
+  .dashboard { grid-template-columns: 1fr 1fr 1.12fr; }
+  .card.balance { transform: translateY(-2px); }
+}
+
+@media (max-width: 900px) {
+  .app { width: min(100% - 40px, 760px); }
+  .welcome { min-height: 220px; }
+  .welcome-buddy { right: 5%; transform: scale(.88); transform-origin: bottom right; }
+  .main-grid { grid-template-columns: 1fr; }
+  .quest-groups { gap: 12px; }
+}
+
+@media (max-width: 600px) {
+  .app { width: calc(100% - 28px); padding: 12px 0 28px; }
+  .page-header { margin-bottom: 14px; }
+  .brand { gap: 7px; font-size: 1.08rem; }
+  .header-note { gap: 5px; padding: 7px 9px; font-size: .68rem; }
+  .welcome { min-height: 205px; padding: 24px 19px; border-radius: 21px; }
+  .welcome h1 { font-size: clamp(1.9rem, 8vw, 2.35rem); }
+  .welcome-copy { max-width: 72%; padding-right: 0; }
+  .welcome-copy > p:nth-of-type(2) { max-width: 255px; font-size: .84rem; }
+  .welcome-buddy { right: -15px; bottom: -34px; width: 118px; height: 118px; border-width: 7px; }
+  .welcome-sticker { right: 9px; bottom: 10px; top: auto; padding: 6px 9px; font-size: .62rem; }
+  .tab-nav {
+    position: sticky;
+    top: 8px;
+    z-index: 5;
+    flex-direction: row;
+    gap: 3px;
+    margin: 14px 0;
+    padding: 4px;
+    box-shadow: 0 4px 14px rgba(38, 53, 71, .08);
+  }
+  .tab-btn { min-width: 0; min-height: 40px; padding: 0 7px; font-size: .78rem; }
+  .dashboard { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin: 12px 0 14px; }
+  .card { min-height: 118px; padding: 14px 12px; border-radius: 16px; }
+  .card.balance { grid-column: 1 / -1; min-height: 126px; }
+  .card h2 { max-width: 78%; font-size: .72rem; }
+  .card p { margin-top: 12px; font-size: clamp(1.18rem, 6vw, 1.6rem); }
+  .card-icon { top: 10px; right: 10px; width: 29px; height: 29px; }
+  .card-caption { font-size: .67rem; }
+  .panel { padding: 18px 15px; border-radius: 18px; }
+  .section-heading { align-items: flex-start; margin-bottom: 15px; }
+  .section-heading h2 { font-size: 1.08rem; }
+  #transaction-form { gap: 12px 9px; }
+  .form-field input, .form-field select { min-height: 43px; font-size: .88rem; }
+  .transaction-tools { flex-wrap: wrap; }
+  .transaction-tools input { min-width: 100%; }
+  .transaction-item { gap: 8px; padding: 9px 7px; }
+  .amount { font-size: .75rem; }
+  .quest-groups { grid-template-columns: 1fr; }
+  .quest-header { align-items: flex-start; }
+  .goal-panel { padding: 18px 15px; }
+  .goal-form { grid-template-columns: 1fr; }
+  .goal-form > * { grid-column: 1 / -1; }
+  .download-section { gap: 10px; padding: 15px; }
+  .download-section > div { min-width: 0; }
+  .secondary-button { width: 100%; }
+}
+
+/* A CSS-only failsafe keeps the splash from trapping visitors if app JS fails. */
+.startup-screen {
+  animation: startup-screen-dismiss .45s ease .35s forwards;
+}
+@keyframes startup-screen-dismiss {
+  to { opacity: 0; visibility: hidden; pointer-events: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .startup-screen { animation-duration: .01ms; animation-delay: 0s; }
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

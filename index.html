@@ -14,260 +14,44 @@
       .brand-logo { display: block; flex: 0 0 auto; width: 44px; height: 44px; object-fit: contain; }
       .startup-logo { width: 96px; height: 96px; object-fit: contain; }
       .welcome-buddy .buddy-face { display: block; width: 150px; height: 150px; object-fit: contain; }
-      @media (max-width: 600px) {
-        .brand-logo { width: 38px; height: 38px; }
-        .welcome-buddy .buddy-face { width: 112px; height: 112px; }
-      }
+      @media (max-width: 600px) { .brand-logo { width: 38px; height: 38px; } .welcome-buddy .buddy-face { width: 112px; height: 112px; } }
     </style>
     <link rel="stylesheet" href="redesign.css" />
     <link rel="stylesheet" href="heading-font.css" />
-    <link rel="stylesheet" href="interaction.css" />
+    <link rel="stylesheet" href="responsive-polish.css" />
+    <script src="transaction-tools.js" defer></script>
     <script src="script.js" defer></script>
   </head>
-
   <body>
-    <div class="startup-screen" id="startup-screen" aria-hidden="true">
-      <div class="startup-content">
-        <img class="startup-logo" src="erasebg-transformed.png" alt="" />
-        <p class="eyebrow">Your friendly money buddy</p>
-        <h1>BaonBuddy</h1>
-        <div class="startup-loader" aria-label="Loading"><span></span><span></span><span></span></div>
-      </div>
-    </div>
-
+    <div class="startup-screen" id="startup-screen" aria-hidden="true"><div class="startup-content"><img class="startup-logo" src="erasebg-transformed.png" alt="" /><p class="eyebrow">Your friendly money buddy</p><h1>BaonBuddy</h1><div class="startup-loader" aria-label="Loading"><span></span><span></span><span></span></div></div></div>
     <main class="app">
-      <header class="page-header">
-        <a class="brand" href="#top" aria-label="BaonBuddy home">
-          <img class="brand-logo" src="erasebg-transformed.png" alt="" />
-          <span>Baon<span>Buddy</span></span>
-        </a>
-        <div class="header-note"><span class="sparkle" aria-hidden="true">✦</span> Little steps add up!</div>
-      </header>
-
-      <section class="welcome" id="top" aria-labelledby="welcome-title">
-        <div class="welcome-copy">
-          <p class="eyebrow">uy beh, hindi lahat ng cravings dapat i-checkout</p>
-          <h1 id="welcome-title">Make your baon<br />go a little further.</h1>
-          <p>Keep track of what comes in, what goes out, and the goals you’re working toward.</p>
-          <a class="chat-link" href="/chat.html">Chat with BaonBuddy <span aria-hidden="true">→</span></a>
-        </div>
-        <div class="welcome-buddy" aria-hidden="true">
-          <img class="buddy-face" src="erasebg-transformed.png" alt="" />
-        </div>
-        <div class="welcome-sticker" aria-hidden="true">You’ve got this!</div>
-      </section>
-
-      <nav class="tab-nav" aria-label="BaonBuddy navigation">
-        <button class="tab-btn active" data-tab="dashboard" type="button">Dashboard</button>
-        <button class="tab-btn" data-tab="goals" type="button">Goals &amp; Quests</button>
-        <button class="tab-btn" data-tab="learn" type="button">Learn</button>
-      </nav>
-
+      <header class="page-header"><a class="brand" href="#top" aria-label="BaonBuddy home"><img class="brand-logo" src="erasebg-transformed.png" alt="" /><span>Baon<span>Buddy</span></span></a><div class="header-note"><span class="sparkle" aria-hidden="true">✦</span> Little steps add up!</div></header>
+      <section class="welcome" id="top" aria-labelledby="welcome-title"><div class="welcome-copy"><p class="eyebrow">uy beh, hindi lahat ng cravings dapat i-checkout</p><h1 id="welcome-title">Make your baon<br />go a little further.</h1><p>Keep track of what comes in, what goes out, and the goals you’re working toward.</p><a class="chat-link" href="/chat.html">Chat with BaonBuddy <span aria-hidden="true">→</span></a></div><div class="welcome-buddy" aria-hidden="true"><img class="buddy-face" src="erasebg-transformed.png" alt="" /></div><div class="welcome-sticker" aria-hidden="true">You’ve got this!</div></section>
+      <nav class="tab-nav" aria-label="BaonBuddy navigation"><button class="tab-btn active" data-tab="dashboard" type="button">Dashboard</button><button class="tab-btn" data-tab="goals" type="button">Goals &amp; Quests</button><button class="tab-btn" data-tab="learn" type="button">Learn</button></nav>
       <section class="tab-panel active" id="dashboard" aria-label="Dashboard tab">
-        <section class="dashboard" aria-label="Your budget at a glance" aria-live="polite">
-          <article class="card income">
-            <div class="card-icon" aria-hidden="true">↗</div>
-            <h2>Total income</h2>
-            <p id="total-income">₱0.00</p>
-            <span class="card-caption">Money in</span>
-          </article>
-          <article class="card expenses">
-            <div class="card-icon" aria-hidden="true">↘</div>
-            <h2>Total expenses</h2>
-            <p id="total-expenses">₱0.00</p>
-            <span class="card-caption">Money out</span>
-          </article>
-          <article class="card balance">
-            <div class="card-icon" aria-hidden="true">✦</div>
-            <h2>Left in your baon</h2>
-            <p id="remaining-balance">₱0.00</p>
-            <span class="card-caption">Your current balance</span>
-          </article>
-        </section>
-
+        <section class="dashboard" aria-label="Your budget at a glance" aria-live="polite"><article class="card income"><div class="card-icon" aria-hidden="true">↗</div><h2>Total income</h2><p id="total-income">₱0.00</p><span class="card-caption">Money in</span></article><article class="card expenses"><div class="card-icon" aria-hidden="true">↘</div><h2>Total expenses</h2><p id="total-expenses">₱0.00</p><span class="card-caption">Money out</span></article><article class="card balance"><div class="card-icon" aria-hidden="true">✦</div><h2>Left in your baon</h2><p id="remaining-balance">₱0.00</p><span class="card-caption">Your current balance</span></article></section>
         <div class="main-grid">
-          <section class="panel entry-form" aria-labelledby="add-title">
-            <div class="section-heading">
-              <div><p class="eyebrow">KEEP YOUR TRACKER UP TO DATE</p><h2 id="add-title">Add a transaction</h2></div>
-              <span class="heading-icon" aria-hidden="true">＋</span>
-            </div>
+          <section class="panel entry-form" aria-labelledby="add-title"><div class="section-heading"><div><p class="eyebrow">KEEP YOUR TRACKER UP TO DATE</p><h2 id="add-title">Add a transaction</h2></div><span class="heading-icon" aria-hidden="true">＋</span></div>
             <form id="transaction-form">
-              <div class="form-field">
-                <label for="type">Type</label>
-                <select id="type" name="type" required>
-                  <option value="income">Income</option>
-                  <option value="expense">Expense</option>
-                </select>
-              </div>
-              <div class="form-field">
-                <label for="category">What was it for?</label>
-                <input id="category" name="category" type="text" placeholder="Food, allowance…" maxlength="60" required />
-              </div>
-              <div class="form-field">
-                <label for="amount">Amount</label>
-                <div class="amount-input"><span aria-hidden="true">₱</span><input id="amount" name="amount" type="number" step="0.01" min="0.01" placeholder="0.00" required /></div>
-              </div>
-              <div class="form-field">
-                <label for="date">Date</label>
-                <input id="date" name="date" type="date" required />
-              </div>
-              <div class="recurring-row">
-                <label class="check-label" for="is-recurring"><input type="checkbox" id="is-recurring" /> <span>This happens regularly</span></label>
-                <div id="recurring-options" class="form-field hidden">
-                  <label for="frequency">Repeat</label>
-                  <select id="frequency" name="frequency">
-                    <option value="weekly">Weekly</option>
-                    <option value="monthly" selected>Monthly</option>
-                    <option value="yearly">Yearly</option>
-                  </select>
-                </div>
-              </div>
-              <button class="primary-button" type="submit">Save transaction <span aria-hidden="true">→</span></button>
+              <div class="form-field"><label for="type">Type</label><select id="type" name="type" required><option value="income">Income</option><option value="expense">Expense</option></select></div>
+              <div class="form-field"><label for="transaction-category">Category</label><select id="transaction-category" name="transactionCategory"><option>Food</option><option>Transport</option><option>School</option><option>Personal</option><option>Other</option></select></div>
+              <div class="form-field" id="custom-category-field" hidden><label for="custom-category">Custom category</label><input id="custom-category" maxlength="40" placeholder="Name this category" /></div>
+              <div class="form-field"><label for="category">Description</label><input id="category" name="description" type="text" placeholder="Lunch, allowance…" maxlength="60" required /></div>
+              <div class="form-field"><label for="amount">Amount</label><div class="amount-input"><span aria-hidden="true">₱</span><input id="amount" name="amount" type="number" step="0.01" min="0.01" placeholder="0.00" required /></div></div>
+              <div class="form-field"><label for="date">Date</label><input id="date" name="date" type="date" required /></div>
+              <div class="recurring-row"><label class="check-label" for="is-recurring"><input type="checkbox" id="is-recurring" /><span>This happens regularly</span></label><div id="recurring-options" class="hidden"><label for="frequency">Frequency</label><select id="frequency"><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="yearly">Yearly</option></select></div></div>
+              <div class="form-actions"><button class="primary-button" id="transaction-submit" type="submit">Save transaction <span aria-hidden="true">→</span></button><button class="secondary-button" id="transaction-cancel" type="button" hidden>Cancel edit</button></div>
             </form>
           </section>
-
-          <section class="panel history" aria-labelledby="history-title">
-            <div class="section-heading">
-              <div><p class="eyebrow">EVERY LITTLE THING COUNTS</p><h2 id="history-title">Recent transactions</h2></div>
-              <span class="heading-icon" aria-hidden="true">☷</span>
-            </div>
-            <ul id="transaction-list" aria-live="polite"></ul>
-          </section>
+          <section class="panel history" aria-labelledby="history-title"><div class="section-heading"><div><p class="eyebrow">EVERY LITTLE THING COUNTS</p><h2 id="history-title">Recent transactions</h2></div><span class="heading-icon" aria-hidden="true">↕</span></div><div class="transaction-tools" aria-label="Transaction search and filters"><label class="sr-only" for="transaction-search">Search transactions</label><input id="transaction-search" type="search" placeholder="Search transactions…" /><label class="sr-only" for="transaction-filter">Filter transactions</label><select id="transaction-filter"><option value="all">All transactions</option><option value="income">Income</option><option value="expense">Expenses</option></select></div><ul id="transaction-list" aria-live="polite"></ul></section>
         </div>
+        <section class="panel spending-summary" aria-labelledby="spending-summary-title"><div class="section-heading"><div><p class="eyebrow">KNOW WHERE YOUR BAON GOES</p><h2 id="spending-summary-title">Spending summary</h2></div></div><div id="spending-summary-content"></div></section>
       </section>
-
-      <section class="tab-panel" id="goals" aria-label="Goals and quests tab">
-        <section class="goal-panel" aria-labelledby="goal-title">
-          <div class="goal-content">
-            <div class="goal-heading">
-              <div class="goal-icon" aria-hidden="true">✦</div>
-              <div>
-                <p class="eyebrow">A LITTLE SAVING GOES A LONG WAY</p>
-                <h2 id="goal-title">Your savings goal</h2>
-              </div>
-            </div>
-
-            <div id="goal-empty" class="goal-empty">
-              <p>Give your next money win a name and a target.</p>
-            </div>
-
-            <div id="goal-progress-view" class="goal-progress-view" hidden>
-              <div class="goal-progress-copy">
-                <div><h3 id="goal-name">My savings goal</h3><p id="goal-message">Every little bit counts.</p></div>
-                <strong id="goal-percent">0%</strong>
-              </div>
-              <div class="progress-track" id="goal-progress-track" role="progressbar" aria-label="Savings goal progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                <div id="goal-progress-fill" class="progress-fill"></div>
-              </div>
-              <div class="goal-totals"><span id="goal-saved">₱0.00 saved</span><span id="goal-target">of ₱0.00</span></div>
-
-              <form id="goal-contribution-form" class="goal-contribution-form">
-                <label class="sr-only" for="goal-contribution">Amount to add to your goal</label>
-                <span aria-hidden="true">₱</span>
-                <input id="goal-contribution" name="contribution" type="number" min="0.01" step="0.01" placeholder="Add savings" required />
-                <button class="goal-add-button" type="submit">Add to goal <span aria-hidden="true">＋</span></button>
-              </form>
-            </div>
-
-            <section class="goal-quests" aria-labelledby="quest-title">
-              <div class="quest-header">
-                <div>
-                  <p class="eyebrow">SMALL STEPS, EXTRA XP</p>
-                  <h3 id="quest-title">Savings quests</h3>
-                </div>
-                <div class="player-score">
-                  <span class="score-label">XP</span>
-                  <strong id="total-points">0</strong>
-                </div>
-              </div>
-
-              <div class="streak-row">
-                <div class="streak-pill">
-                  <span aria-hidden="true">🔥</span>
-                  <strong id="current-streak">0 day streak</strong>
-                </div>
-                <div class="streak-pill">
-                  <span aria-hidden="true">🏆</span>
-                  <strong id="best-streak">Best: 0</strong>
-                </div>
-              </div>
-
-  <div class="quest-groups">
-                <div class="quest-group">
-                  <h4>Daily</h4>
-                  <ul id="daily-quests" class="quest-list" aria-live="polite"></ul>
-                </div>
-                <div class="quest-group">
-                  <h4>This week</h4>
-                  <ul id="weekly-quests" class="quest-list" aria-live="polite"></ul>
-                </div>
-              </div>
-            </section>
-          </div>
-
-          <form id="goal-form" class="goal-form">
-            <p class="goal-form-title" id="goal-form-heading">Start a goal</p>
-            <label for="goal-name-input">What are you saving for?</label>
-            <input id="goal-name-input" name="goalName" type="text" maxlength="60" placeholder="A new pair of shoes…" required />
-            <label for="goal-target-input">Savings target</label>
-            <div class="goal-target-input"><span aria-hidden="true">₱</span><input id="goal-target-input" name="target" type="number" min="0.01" step="0.01" placeholder="0.00" required /></div>
-            <button type="submit" class="goal-save-button"><span id="goal-save-label">Create my goal</span><span aria-hidden="true">→</span></button>
-            <button type="button" id="goal-clear" class="goal-clear-button" hidden>Remove goal</button>
-          </form>
-        </section>
-      
-      <section class="tab-panel" id="learn" aria-label="Learn tab">
-        <div class="learn-wrap">
-          <div class="learn-header">
-            <p class="eyebrow">LEVEL UP YOUR MONEY HABITS</p>
-            <h2>Money lessons</h2>
-          </div>
-
-          <div class="lesson-list">
-            <article class="lesson-card complete">
-              <span class="lesson-badge">1</span>
-              <div>
-                <h3>Budget basics</h3>
-                <p>Know where your money is going before it disappears.</p>
-              </div>
-              <button type="button">Complete</button>
-            </article>
-
-            <article class="lesson-card">
-              <span class="lesson-badge">2</span>
-              <div>
-                <h3>Needs vs wants</h3>
-                <p>Separate essentials from cravings and impulse buys.</p>
-              </div>
-              <button type="button">Start</button>
-            </article>
-
-            <article class="lesson-card">
-              <span class="lesson-badge">3</span>
-              <div>
-                <h3>Save for your next goal</h3>
-                <p>Build a habit one small win at a time.</p>
-              </div>
-              <button type="button">Start</button>
-            </article>
-
-            <article class="lesson-card">
-              <span class="lesson-badge">4</span>
-              <div>
-                <h3>Money mindset</h3>
-                <p>Keep your spending aligned with your goals.</p>
-              </div>
-              <button type="button">Start</button>
-            </article>
-          </div>
-        </div>
+      <section class="tab-panel" id="goals" aria-label="Goals and quests tab"><section class="goal-panel" aria-labelledby="goal-title"><div class="goal-content"><div class="goal-heading"><div class="goal-icon" aria-hidden="true">◎</div><div><p class="eyebrow">YOUR NEXT LITTLE WIN</p><h2 id="goal-title">Savings goal</h2></div></div><div id="goal-empty" class="goal-empty"><p>Choose something you’re excited to save for.</p></div><div id="goal-progress-view" class="goal-progress-view" hidden><div class="goal-progress-copy"><div><h3 id="goal-name"></h3><p id="goal-message"></p></div><strong id="goal-percent"></strong></div><div class="progress-track" id="goal-progress-track" role="progressbar" aria-label="Savings goal progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" id="goal-progress-fill"></div></div><div class="goal-totals"><span id="goal-saved"></span><span id="goal-target"></span></div><form class="goal-contribution-form" id="goal-contribution-form"><span aria-hidden="true">₱</span><input id="goal-contribution" type="number" min="0.01" step="0.01" placeholder="Add savings" /><button class="goal-add-button" type="submit">Add savings</button></form></div></div><form id="goal-form" class="goal-form"><p class="goal-form-title" id="goal-form-heading">Start a goal</p><label for="goal-name-input">What are you saving for?</label><input id="goal-name-input" maxlength="60" placeholder="e.g. New headphones" /><label for="goal-target">Target amount</label><div class="goal-target-input"><span>₱</span><input id="goal-target" type="number" min="0.01" step="0.01" placeholder="0.00" /></div><button class="goal-save-button" type="submit"><span id="goal-save-label">Create my goal</span><span aria-hidden="true">→</span></button><button class="goal-clear-button" id="goal-clear" type="button" hidden>Clear goal</button></form></section>
+        <section class="quest-panel goal-quests" aria-labelledby="quest-title"><div class="quest-header"><div><p class="eyebrow">SMALL STEPS, EXTRA XP</p><h3 id="quest-title">Savings quests</h3></div><div class="player-score"><span aria-hidden="true">⭐</span><strong id="quest-points">0 XP</strong></div></div><div class="streak-row"><div class="streak-pill"><span aria-hidden="true">🔥</span><strong id="current-streak">0 day streak</strong></div><div class="streak-pill"><span aria-hidden="true">🏆</span><strong id="best-streak">Best: 0</strong></div></div><div class="quest-groups"><div class="quest-group"><h4>Daily</h4><ul id="daily-quests" class="quest-list" aria-live="polite"></ul></div><div class="quest-group"><h4>This week</h4><ul id="weekly-quests" class="quest-list" aria-live="polite"></ul></div></div></section>
       </section>
-
-      <section class="download-section" aria-labelledby="download-title">
-        <span class="download-icon" aria-hidden="true">↓</span>
-        <div><p class="eyebrow">TAKE IT WITH YOU</p><h2 id="download-title">Your records, anytime</h2><p>Download your transactions as a spreadsheet-friendly CSV.</p></div>
-        <button type="button" id="download-csv" class="secondary-button">Download CSV <span aria-hidden="true">↗</span></button>
-      </section>
+      <section class="tab-panel" id="learn" aria-label="Learn tab"><div class="learn-wrap"><div class="learn-header"><p class="eyebrow">LEVEL UP YOUR MONEY HABITS</p><h2>Money lessons</h2></div><div class="lesson-list"><article class="lesson-card complete"><span class="lesson-badge">1</span><div><h3>Budget basics</h3><p>Know where your money is going before it disappears.</p></div><button type="button">Complete</button></article><article class="lesson-card"><span class="lesson-badge">2</span><div><h3>Needs vs wants</h3><p>Separate essentials from cravings and impulse buys.</p></div><button type="button">Start</button></article><article class="lesson-card"><span class="lesson-badge">3</span><div><h3>Save for your next goal</h3><p>Build a habit one small win at a time.</p></div><button type="button">Start</button></article><article class="lesson-card"><span class="lesson-badge">4</span><div><h3>Money mindset</h3><p>Build healthy habits and make your money choices with confidence.</p></div><button type="button">Start</button></article></div></div></section>
+      <section class="download-section" aria-labelledby="download-title"><span class="download-icon" aria-hidden="true">↓</span><div><p class="eyebrow">TAKE IT WITH YOU</p><h2 id="download-title">Your records, anytime</h2><p>Download your transactions as a spreadsheet-friendly CSV.</p></div><button type="button" id="download-csv" class="secondary-button">Download CSV <span aria-hidden="true">↗</span></button></section>
       <footer class="page-footer">Made for your next little money win <span aria-hidden="true">♥</span></footer>
     </main>
   </body>
