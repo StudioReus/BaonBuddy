@@ -1,5 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Gorditas:wght@400;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oi&display=swap');
 
 :root {
   color-scheme: light;
@@ -26,7 +26,7 @@ body {
   min-height: 100vh;
   background: var(--paper);
   color: var(--ink);
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Nunito', sans-serif;
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
 }
@@ -34,9 +34,7 @@ button, input, select { font: inherit; }
 button { -webkit-tap-highlight-color: transparent; }
 button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid rgba(238, 159, 40, .35); outline-offset: 3px; }
 
-h1, h2, h3, .brand, .welcome h1, .startup-content h1, .page-header h1 {
-  font-family: 'Gorditas', cursive;
-}
+h1, h2, h3, .welcome h1, .startup-content h1, .page-header h1 { font-family: 'Nunito', sans-serif; }
 
 .app { width: min(1120px, calc(100% - 40px)); margin: 0 auto; padding: 22px 0 36px; }
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }

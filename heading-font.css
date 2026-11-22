@@ -1,9 +1,32 @@
-/* Bring back Gorditas for the main page's display headings only. */
-body .welcome h1,
-body .goal-heading h2,
-body .goal-progress-copy h3,
-body .section-heading h2,
-body .download-section h2,
+/* Oi is reserved for BaonBuddy brand moments only. */
+body .brand,
+body .brand-home,
 body .startup-content h1 {
-  font-family: 'Gorditas', cursive;
+  font-family: 'Oi', cursive;
+  font-weight: 400;
+  letter-spacing: -.02em;
+}
+
+.welcome-buddy {
+  transform: translate3d(0, var(--parallax-y, 0), 0);
+  will-change: transform;
+}
+
+.welcome-sticker {
+  transform: translate3d(0, var(--parallax-y-small, 0), 0);
+  will-change: transform;
+}
+
+.lesson-card {
+  transform: translateY(var(--lesson-parallax-y, 0));
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-buddy,
+  .welcome-sticker,
+  .lesson-card {
+    transform: none;
+    will-change: auto;
+  }
 }
