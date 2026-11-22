@@ -34,7 +34,19 @@
       button:disabled { cursor: wait; opacity: .65; }
       #status { min-height: 1.5em; padding: 0 18px 12px; color: #80685b; font-size: .9rem; }
       .note { margin: 12px 4px; color: #80685b; font-size: .85rem; }
-      @media (max-width: 480px) { body { padding: 16px 10px; } #messages { min-height: 50vh; padding: 14px; } #chat-form { padding: 10px; } button { padding-inline: 14px; } }
+      @media (max-width: 480px) {
+        body { width: 100%; max-width: 100%; overflow-x: hidden; padding: 12px 10px 24px; }
+        main { width: 100%; }
+        .brand-home { max-width: 100%; }
+        h1 { line-height: 1.12; }
+        #messages { min-height: 46vh; max-height: 56vh; padding: 12px; }
+        .bubble { max-width: 92%; }
+        #chat-form { align-items: stretch; flex-direction: column; }
+        #message { width: 100%; min-height: 44px; }
+        #chat-form button { width: 100%; min-height: 44px; }
+        #status { padding-inline: 12px; }
+        .note { overflow-wrap: anywhere; }
+      }
     </style>
     <link rel="stylesheet" href="/redesign.css" />
   </head>

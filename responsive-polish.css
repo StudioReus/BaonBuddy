@@ -1436,3 +1436,250 @@ body.tutorial-open {
     margin-bottom: 8px;
   }
 }
+
+/* Final mobile safeguards for narrow screens and long user-entered values. */
+@media (max-width: 600px) {
+  html, body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .app {
+    width: calc(100% - 24px);
+  }
+
+  .page-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .brand {
+    min-width: 0;
+  }
+
+  .brand > span:last-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .header-stats {
+    min-width: 0;
+  }
+
+  .sound-toggle {
+    width: 34px;
+    min-height: 34px;
+    padding: 5px;
+  }
+
+  .sound-toggle span {
+    display: none;
+  }
+
+  .header-stat {
+    min-width: 42px;
+  }
+
+  .welcome {
+    min-height: 220px;
+  }
+
+  .welcome-copy {
+    max-width: calc(100% - 70px);
+  }
+
+  .welcome-actions {
+    flex-wrap: wrap;
+  }
+
+  .welcome-actions .chat-link,
+  .welcome-actions .tutorial-button {
+    max-width: 100%;
+  }
+
+  #transaction-form,
+  .goal-form,
+  .recurring-row,
+  .filter-row {
+    grid-template-columns: 1fr;
+  }
+
+  #transaction-form > .form-field,
+  #transaction-form > .recurring-details,
+  #transaction-form > .form-actions,
+  #transaction-form > .primary-button,
+  .recurring-row > *,
+  .filter-row > * {
+    grid-column: 1 / -1;
+  }
+
+  #recurring-options {
+    width: 100%;
+  }
+
+  .transaction-tools input,
+  .transaction-tools select,
+  .filter-row input,
+  .filter-row select {
+    width: 100%;
+  }
+
+  .transaction-item {
+    align-items: flex-start;
+  }
+
+  .transaction-details {
+    min-width: 0;
+  }
+
+  .amount {
+    max-width: 38%;
+    overflow-wrap: anywhere;
+    text-align: right;
+  }
+
+  .download-section {
+    align-items: flex-start;
+  }
+
+  .daily-goal-panel,
+  .goal-contribution-form,
+  .achievement-header,
+  .goal-progress-copy {
+    min-width: 0;
+  }
+
+  .achievement-grid,
+  .shop-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .shop-item,
+  .achievement-card {
+    min-width: 0;
+  }
+
+  .achievement-card {
+    align-items: flex-start;
+  }
+
+  .lesson-path,
+  .chapter-tabs {
+    max-width: 100%;
+  }
+
+  .lesson-shell {
+    width: calc(100% - 24px);
+  }
+
+  .lesson-topbar {
+    grid-template-columns: 68px minmax(0, 1fr) 64px;
+  }
+
+  .lesson-teach-card article {
+    grid-template-columns: 34px minmax(0, 1fr);
+  }
+
+  .lesson-teach-card h2,
+  .lesson-teach-card p,
+  .answer-option,
+  .answer-feedback {
+    overflow-wrap: anywhere;
+  }
+
+  .answer-next,
+  .lesson-primary,
+  .complete-screen .lesson-primary {
+    width: 100%;
+  }
+}
+
+@media (max-width: 380px) {
+  .app {
+    width: calc(100% - 16px);
+  }
+
+  .brand {
+    font-size: 1rem;
+  }
+
+  .brand-logo {
+    width: 34px;
+    height: 34px;
+  }
+
+  .header-stat {
+    min-width: 38px;
+    padding-inline: 5px;
+  }
+
+  .welcome {
+    min-height: 210px;
+    padding-inline: 16px;
+  }
+
+  .welcome-copy {
+    max-width: calc(100% - 58px);
+  }
+
+  .welcome h1 {
+    font-size: 1.72rem;
+  }
+
+  .welcome-copy > p:nth-of-type(2) {
+    max-width: 210px;
+  }
+
+  .welcome-buddy {
+    right: -20px;
+    width: 108px;
+    height: 108px;
+  }
+
+  .tab-nav {
+    left: 8px;
+    right: 8px;
+  }
+
+  .dashboard {
+    gap: 6px;
+  }
+
+  .card {
+    padding-inline: 10px;
+  }
+
+  .card p {
+    font-size: 1.08rem;
+  }
+
+  .panel,
+  .goal-panel,
+  .achievement-panel,
+  .buddy-shop {
+    padding-inline: 12px;
+  }
+
+  .achievement-card {
+    display: grid;
+    justify-items: start;
+  }
+
+  .lesson-topbar {
+    grid-template-columns: 58px minmax(0, 1fr) 58px;
+  }
+
+  .lesson-xp {
+    font-size: .68rem;
+  }
+
+  .chapter-node {
+    width: 112px;
+  }
+
+  .chapter-node-label {
+    max-width: 112px;
+  }
+}
