@@ -40,6 +40,7 @@
     addStyles();
     setupCategories();
     setupFilters();
+    setupFriendlyControls();
     setupSummary();
     setupImportExport();
     form.addEventListener("submit", submitTransaction, true);
@@ -55,6 +56,26 @@
   function addStyles() {
     const style = document.createElement("style");
     style.textContent = `
+      .transaction-kind-field { grid-column:1/-1; }
+      .visually-hidden-select { position:absolute !important; width:1px !important; height:1px !important; padding:0 !important; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0 !important; }
+      .transaction-kind { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+      .kind-button { min-height:46px; border:2px solid #e7ecf1; border-bottom-width:4px; border-radius:13px; background:#fff; color:#647487; cursor:pointer; font-weight:900; }
+      .kind-button.active[data-kind="expense"] { border-color:#df8177; background:#fff3f0; color:#b95249; }
+      .kind-button.active[data-kind="income"] { border-color:#e7b34e; background:#fff6df; color:#9a6510; }
+      .recurring-details,.history-more { grid-column:1/-1; }
+      .recurring-details summary,.history-more summary { width:max-content; color:#718094; cursor:pointer; font-size:.78rem; font-weight:900; }
+      .recurring-details[open] summary { margin-bottom:10px; }
+      .history-chips { display:flex; gap:7px; margin-top:10px; }
+      .history-chip { min-height:36px; flex:1; border:1.5px solid #e6ebf0; border-radius:999px; background:#fff; color:#718094; cursor:pointer; font-weight:900; }
+      .history-chip.active { border-color:#efc889; background:#fff3df; color:#9a6510; }
+      .history-more { margin-top:9px; }
+      .history-more[open] { padding:10px; border:1px solid #edf0f3; border-radius:12px; background:#fbfcfd; }
+      .history-month { width:100%; margin:14px 0 7px; color:#718094; font-size:.72rem; font-weight:900; letter-spacing:.06em; text-transform:uppercase; }
+      .history-empty { min-height:150px; }
+      .transaction-item { border:0; border-bottom:1px solid #edf0f3; border-radius:0; background:transparent; }
+      .transaction-item:first-child { border-radius:14px 14px 0 0; }
+      .transaction-category { font-size:.88rem; }
+      .transaction-description { margin-top:1px; color:#718094; }
       .transaction-tools { display:grid; gap:9px; margin:0 0 14px; }
       .transaction-tools input,.transaction-tools select,.summary-controls input,.summary-controls select { min-width:0; min-height:40px; padding:8px 10px; border:1px solid #e3e7ed; border-radius:11px; background:#fbfcfd; color:#263547; }
       .filter-row,.summary-controls { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
@@ -72,7 +93,14 @@
       .transaction-tag { display:inline-block; width:max-content; max-width:100%; padding:2px 7px; border-radius:999px; background:#fff4df; color:#85550d; font-size:.66rem; font-weight:800; }
       .transaction-description { overflow:hidden; color:#806f64; font-size:.76rem; text-overflow:ellipsis; white-space:nowrap; }
       .spending-summary { margin-top:18px; }
-      .summary-controls { margin-bottom:12px; color:#705b50; font-size:.82rem; font-weight:800; }
+      .summary-mode-tabs { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin:14px 0; padding:5px; border-radius:13px; background:#f3f5f7; }
+      .summary-mode-tabs button { min-height:40px; border:0; border-radius:10px; background:transparent; color:#718094; cursor:pointer; font:inherit; font-weight:900; }
+      .summary-mode-tabs button.active { background:#fff; color:#9a6510; box-shadow:0 4px 14px #26354712; }
+      .summary-detail-grid { display:grid; grid-template-columns:minmax(150px,.8fr) minmax(0,1.2fr); gap:18px; align-items:start; }
+      .summary-chart-card,.summary-category-card { border:1px solid #edf0f3; border-radius:16px; background:#fff; padding:14px; }
+      .summary-chart-heading { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+      .summary-chart-heading div { display:grid; gap:3px; }.summary-chart-heading small { color:#718094; }
+      .summary-controls { margin:0; color:#705b50; font-size:.82rem; font-weight:800; }
       .summary-controls input,.summary-controls select { min-width:120px; }
       .summary-period-label { margin:0 0 12px; color:#806f64; font-size:.85rem; font-weight:800; }
       .summary-cards { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:9px; }
@@ -100,7 +128,7 @@
       .quest-hint { color:#718094; font-size:.78rem; line-height:1.45; overflow-wrap:anywhere; }
       .quest-action { display:flex; flex:0 0 auto; align-items:center; gap:8px; }
       .quest-item { align-items:flex-start; }
-      @media(max-width:600px) { .summary-cards { grid-template-columns:repeat(2,minmax(0,1fr)); } .summary-visual { grid-template-columns:1fr; } .filter-row > * { flex-basis:calc(50% - 8px); } .form-actions { flex-wrap:wrap; } .quest-item { gap:8px; } .quest-action { flex-wrap:wrap; justify-content:flex-end; } }
+      @media(max-width:600px) { .summary-cards { grid-template-columns:repeat(2,minmax(0,1fr)); } .summary-visual { grid-template-columns:1fr; } .filter-row > * { flex-basis:calc(50% - 8px); } .form-actions { flex-wrap:wrap; } .quest-item { gap:8px; } .quest-action { flex-wrap:wrap; justify-content:flex-end; } .transaction-kind-field { grid-column:1/-1; } .transaction-kind { gap:6px; } .kind-button { min-height:44px; font-size:.76rem; } .history-more .filter-row { grid-template-columns:1fr; } .transaction-item { gap:7px; } .transaction-actions { gap:1px; } }
     `;
     document.head.appendChild(style);
   }
@@ -118,8 +146,8 @@
     const description = $("category");
     if (description) {
       const label = document.querySelector('label[for="category"]');
-      if (label) label.textContent = "Description";
-      description.placeholder = "Lunch, weekly allowance…";
+      if (label) label.textContent = "What was it for?";
+      description.placeholder = "Lunch, fare, or allowance";
     }
   }
 
@@ -161,6 +189,42 @@
     container.querySelectorAll("#transaction-filter").forEach((legacy) => legacy.addEventListener("change", renderTransactions));
   }
 
+  function setupFriendlyControls() {
+    const select = $("type");
+    $("amount")?.addEventListener("input", (event) => event.target.setCustomValidity(""));
+    document.querySelectorAll(".kind-button").forEach((button) => {
+      button.addEventListener("click", () => {
+        const kind = button.dataset.kind;
+        if (select) select.value = kind;
+        document.querySelectorAll(".kind-button").forEach((item) => item.classList.toggle("active", item === button));
+      });
+    });
+    document.querySelectorAll(".history-chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        document.querySelectorAll(".history-chip").forEach((item) => item.classList.toggle("active", item === chip));
+        const typeFilter = $("type-filter");
+        if (typeFilter) typeFilter.value = chip.dataset.historyType;
+        const legacy = $("transaction-filter");
+        if (legacy) legacy.value = chip.dataset.historyType;
+        renderTransactions();
+      });
+    });
+    $("type-filter")?.addEventListener("change", () => {
+      const value = $("type-filter").value;
+      document.querySelectorAll(".history-chip").forEach((chip) => {
+        chip.classList.toggle("active", chip.dataset.historyType === value);
+      });
+    });
+  }
+
+  function syncKindButtons(kind) {
+    const select = $("type");
+    if (select) select.value = kind;
+    document.querySelectorAll(".kind-button").forEach((button) => {
+      button.classList.toggle("active", button.dataset.kind === kind);
+    });
+  }
+
   function setupSummary() {
     const root = $("spending-summary-content") || $("spending-summary-container") || $("spending-summary-content");
     const host = $("spending-summary-content") || $("spending-summary-content");
@@ -172,14 +236,23 @@
       if (!content) { content = document.createElement("div"); content.id = "spending-summary-content"; section.appendChild(content); }
     }
     content.innerHTML = `
-      <div class="summary-controls"><label for="summary-period">View</label><select id="summary-period"><option value="day">Day</option><option value="week">Week</option><option value="month" selected>Month</option></select><label for="summary-date">Around</label><input id="summary-date" type="date" aria-label="Choose a date for the summary" /></div>
-      <p class="summary-period-label" id="summary-period-label"></p>
-      <div class="summary-cards"><div><span>Income</span><strong id="period-income">₱0.00</strong></div><div><span>Spending</span><strong id="period-expenses">₱0.00</strong></div><div><span>Net</span><strong id="period-net">₱0.00</strong></div><div><span>Transactions</span><strong id="period-count">0</strong></div></div>
-      <div class="summary-visual"><div class="spending-donut" id="spending-donut" role="img" aria-label="Spending by category"><div class="donut-hole"><strong id="donut-total">₱0</strong><span>spent</span></div></div><ul class="category-breakdown" id="category-breakdown" aria-label="Spending category legend"></ul></div>
-      <h3>Quick analysis</h3><ul class="analysis-list" id="summary-analysis"></ul>`;
+      <div class="summary-topbar"><div><p class="summary-kicker">MONEY OVERVIEW</p><p class="summary-period-label" id="summary-period-label"></p></div><div class="summary-controls"><label for="summary-period">Period</label><select id="summary-period"><option value="day">Day</option><option value="week">Week</option><option value="month" selected>Month</option></select><label for="summary-date">Around</label><input id="summary-date" type="date" aria-label="Choose a date for the summary" /></div></div>
+      <div class="summary-mode-tabs" role="tablist" aria-label="Summary view"><button type="button" data-summary-mode="general" class="active" role="tab" aria-selected="true">General</button><button type="button" data-summary-mode="spending" role="tab" aria-selected="false">Spending</button><button type="button" data-summary-mode="income" role="tab" aria-selected="false">Income</button></div>
+      <div class="summary-cards"><article class="summary-card income"><span>Money in</span><strong id="period-income">₱0.00</strong><small id="income-change">This period</small></article><article class="summary-card spending"><span>Money out</span><strong id="period-expenses">₱0.00</strong><small id="expense-change">This period</small></article><article class="summary-card net"><span>Left over</span><strong id="period-net">₱0.00</strong><small id="period-savings-rate">0% of income</small></article><article class="summary-card count"><span>Transactions</span><strong id="period-count">0</strong><small>Records in this period</small></article></div>
+      <div class="summary-detail-grid"><section class="summary-chart-card"><div class="summary-chart-heading"><div><span id="summary-chart-label">Spending breakdown</span><strong id="donut-total">₱0</strong></div><small id="summary-chart-detail">by category</small></div><div class="spending-donut" id="spending-donut" role="img" aria-label="Money breakdown"><div class="donut-hole"><strong id="donut-percent">0%</strong><span id="donut-caption">of income</span></div></div></section><section class="summary-category-card"><div class="summary-chart-heading"><span id="summary-list-label">Top spending</span><small id="category-period-count">0 categories</small></div><ul class="category-breakdown" id="category-breakdown" aria-label="Summary breakdown"></ul></section></div>
+      <div class="summary-insights"><h3 id="summary-insights-title">Your quick read</h3><ul class="analysis-list" id="summary-analysis"></ul></div>`;
     const date = $("summary-date"); date.value = todayKey();
     $("summary-period").addEventListener("change", updateSummary);
     date.addEventListener("change", updateSummary);
+    content.querySelectorAll("[data-summary-mode]").forEach((button) => button.addEventListener("click", () => {
+      content.querySelectorAll("[data-summary-mode]").forEach((tab) => {
+        const active = tab === button;
+        tab.classList.toggle("active", active);
+        tab.setAttribute("aria-selected", String(active));
+      });
+      content.dataset.summaryMode = button.dataset.summaryMode;
+      updateSummary();
+    }));
   }
 
   function setupImportExport() {
@@ -223,8 +296,15 @@
     const form = $("transaction-form"); if (!form.reportValidity()) return;
     const chosen = $("transaction-category")?.value || "Other";
     const category = chosen === "Other" ? $("custom-category")?.value.trim() : chosen;
-    const amount = Number($("amount").value); const date = $("date").value; const description = $("category").value.trim();
-    if (!category || !Number.isFinite(amount) || amount <= 0 || !date) return;
+    const amountInput = $("amount");
+    const amount = Number(amountInput?.value); const date = $("date").value; const description = $("category").value.trim();
+    if (!Number.isFinite(amount) || amount <= 0) {
+      amountInput?.setCustomValidity("Enter an amount greater than zero.");
+      amountInput?.reportValidity();
+      return;
+    }
+    amountInput?.setCustomValidity("");
+    if (!category || !date) return;
     const rows = readTransactions(); const previous = editingId ? rows.find((row) => row.id === editingId) : null;
     const recurring = Boolean($("is-recurring")?.checked);
     const row = { ...(previous || {}), id: editingId || createId(), type: $("type").value, category, description, amount, date, recurring, frequency: $("frequency")?.value || "monthly" };
@@ -232,19 +312,26 @@
     const next = previous ? rows.map((item) => item.id === editingId ? row : item) : [...rows, row];
     if (!writeTransactions(next)) return;
     const wasEditing = Boolean(editingId); cancelEdit(); form.reset();
+    syncKindButtons("expense");
     if ($("date")) $("date").value = todayKey(); $("recurring-options")?.classList.add("hidden");
     const custom = $("custom-category-field"); if (custom) custom.hidden = true;
     if ($("custom-category")) $("custom-category").required = false;
     renderTransactions();
     if (!wasEditing && typeof completeQuest === "function") completeQuest("daily", "log-transaction");
+    if (!wasEditing && window.BaonBuddyProgress) {
+      window.BaonBuddyProgress.checkIn();
+      window.BaonBuddyProgress.addXp(5, 1);
+      window.BaonBuddyProgress.evaluateAchievements();
+    }
     $("category")?.focus();
   }
   function startEdit(id) {
     const row = readTransactions().find((item) => item.id === id); if (!row) return;
-    editingId = id; $("add-title").textContent = "Edit transaction";
+    editingId = id; $("add-title").textContent = "Update this record";
     const submit = $("transaction-submit"); submit.textContent = "Save changes";
     const cancel = $("transaction-cancel"); if (cancel) cancel.hidden = false;
     $("type").value = row.type;
+    syncKindButtons(row.type);
     const select = $("transaction-category");
     const isStandard = [...select.options].some((option) => option.value === row.category);
     select.value = isStandard ? row.category : "Other";
@@ -257,8 +344,9 @@
   }
   function cancelEdit() {
     editingId = null; const form = $("transaction-form"); form?.reset();
-    if ($("add-title")) $("add-title").textContent = "Add a transaction";
-    if ($("transaction-submit")) $("transaction-submit").innerHTML = 'Save transaction <span aria-hidden="true">→</span>';
+    syncKindButtons("expense");
+    if ($("add-title")) $("add-title").textContent = "Record money";
+    if ($("transaction-submit")) $("transaction-submit").innerHTML = 'Add to my money <span aria-hidden="true">→</span>';
     if ($("transaction-cancel")) $("transaction-cancel").hidden = true;
     if ($("custom-category-field")) $("custom-category-field").hidden = true;
     if ($("custom-category")) $("custom-category").required = false;
@@ -276,8 +364,21 @@
       return (!query || haystack.includes(query)) && (type === "all" || row.type === type) && (category === "all" || row.category === category) && (!from || row.date >= from) && (!to || row.date <= to);
     }).sort((a,b) => direction === "oldest" ? a.date.localeCompare(b.date) || a.id.localeCompare(b.id) : b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
     list.replaceChildren();
-    if (!rows.length) { const empty = document.createElement("li"); empty.className = "empty-state"; empty.textContent = readTransactions().length ? "No transactions match these filters." : "No transactions yet — add one to get started."; list.appendChild(empty); }
-    else rows.forEach((row) => list.appendChild(createItem(row)));
+    if (!rows.length) { const empty = document.createElement("li"); empty.className = "empty-state history-empty"; empty.innerHTML = readTransactions().length ? "<strong>No matching activity</strong><span>Try a different search or filter.</span>" : "<strong>Nothing recorded yet</strong><span>Start with what came in or went out today.</span>"; list.appendChild(empty); }
+    else {
+      let currentMonth = "";
+      rows.forEach((row) => {
+        const month = formatMonth(row.date);
+        if (month !== currentMonth) {
+          currentMonth = month;
+          const heading = document.createElement("li");
+          heading.className = "history-month";
+          heading.textContent = month;
+          list.appendChild(heading);
+        }
+        list.appendChild(createItem(row));
+      });
+    }
     updateSummary();
   }
   function createItem(row) {
@@ -285,9 +386,8 @@
     const icon = document.createElement("span"); icon.className = `transaction-icon ${row.type}`; icon.setAttribute("aria-hidden", "true"); icon.textContent = row.type === "income" ? "↗" : "−";
     const details = document.createElement("div"); details.className = "transaction-details";
     const title = document.createElement("span"); title.className = "transaction-category"; title.textContent = row.description || row.category;
-    const tag = document.createElement("span"); tag.className = "transaction-tag"; tag.textContent = row.category;
-    const meta = document.createElement("small"); meta.className = "transaction-date"; meta.textContent = `${formatDate(row.date)}${row.recurring ? ` · Repeats ${row.frequency}` : row.recurrenceId ? " · Recurring entry" : ""}`;
-    details.append(title, tag, meta);
+    const meta = document.createElement("small"); meta.className = "transaction-date transaction-description"; meta.textContent = `${row.category}${row.recurring ? " · Regular" : ""}`;
+    details.append(title, meta);
     const amount = document.createElement("span"); amount.className = `amount ${row.type}`; amount.textContent = `${row.type === "income" ? "+" : "−"}${formatMoney(row.amount)}`;
     const actions = document.createElement("div"); actions.className = "transaction-actions";
     const edit = document.createElement("button"); edit.type = "button"; edit.className = "edit-button"; edit.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg>'; edit.setAttribute("aria-label", `Edit ${row.description || row.category}`); edit.title = "Edit transaction"; edit.addEventListener("click", () => startEdit(row.id));
@@ -325,35 +425,111 @@
   }
   function updatePeriodSummary(rows) {
     if (!$("summary-period")) return;
-    const period = $("summary-period").value || "month"; const anchor = $("summary-date").value || todayKey();
-    const [year,month,day] = anchor.split("-").map(Number); let start = new Date(year,month-1,day); let end = new Date(year,month-1,day);
-    if (period === "week") { start.setDate(start.getDate() - ((start.getDay()+6)%7)); end = new Date(start); end.setDate(start.getDate()+6); }
-    if (period === "month") { start = new Date(year,month-1,1); end = new Date(year,month,0); }
-    const startKey = todayKey(start), endKey = todayKey(end); const matching = rows.filter((row) => row.date >= startKey && row.date <= endKey);
-    const income = matching.filter((row) => row.type === "income").reduce((sum,row) => sum+row.amount,0);
-    const expenses = matching.filter((row) => row.type === "expense").reduce((sum,row) => sum+row.amount,0);
-    setText("period-income",formatMoney(income)); setText("period-expenses",formatMoney(expenses)); setText("period-net",formatMoney(income-expenses)); setText("period-count",String(matching.length));
-    setText("summary-period-label",`${period[0].toUpperCase()+period.slice(1)}: ${period === "day" ? formatDate(startKey) : `${formatDate(startKey)} – ${formatDate(endKey)}`}`);
-    setText("donut-total",formatCompactMoney(expenses));
-    const totals = new Map(); matching.filter((row) => row.type === "expense").forEach((row) => totals.set(row.category,(totals.get(row.category)||0)+row.amount));
-    const sorted = [...totals.entries()].sort((a,b) => b[1]-a[1]);
+    const period = $("summary-period").value || "month";
+    const anchor = $("summary-date").value || todayKey();
+    const [year, month, day] = anchor.split("-").map(Number);
+    let start = new Date(year, month - 1, day);
+    let end = new Date(year, month - 1, day);
+    if (period === "week") { start.setDate(start.getDate() - ((start.getDay() + 6) % 7)); end = new Date(start); end.setDate(start.getDate() + 6); }
+    if (period === "month") { start = new Date(year, month - 1, 1); end = new Date(year, month, 0); }
+    const startKey = todayKey(start), endKey = todayKey(end);
+    const matching = rows.filter((row) => row.date >= startKey && row.date <= endKey);
+    const incomeRows = matching.filter((row) => row.type === "income");
+    const expenseRows = matching.filter((row) => row.type === "expense");
+    const income = incomeRows.reduce((sum, row) => sum + row.amount, 0);
+    const expenses = expenseRows.reduce((sum, row) => sum + row.amount, 0);
+    const mode = $("spending-summary-content")?.dataset.summaryMode || "general";
+    const savingsRate = income > 0 ? Math.round((income - expenses) / income * 100) : 0;
+    setText("period-income", formatMoney(income));
+    setText("period-expenses", formatMoney(expenses));
+    setText("period-net", formatMoney(income - expenses));
+    setText("period-count", String(matching.length));
+    setText("summary-period-label", `${period[0].toUpperCase() + period.slice(1)}: ${period === "day" ? formatDate(startKey) : `${formatDate(startKey)} – ${formatDate(endKey)}`}`);
+    setText("period-savings-rate", `${Math.max(0, savingsRate)}% margin`);
+
+    const duration = Math.round((end.getTime() - start.getTime()) / 86400000) + 1;
+    const priorEnd = new Date(start); priorEnd.setDate(priorEnd.getDate() - 1);
+    const priorStart = new Date(priorEnd); priorStart.setDate(priorStart.getDate() - duration + 1);
+    const priorMatching = rows.filter((row) => row.date >= todayKey(priorStart) && row.date <= todayKey(priorEnd));
+    const priorIncome = priorMatching.filter((row) => row.type === "income").reduce((sum, row) => sum + row.amount, 0);
+    const priorExpenses = priorMatching.filter((row) => row.type === "expense").reduce((sum, row) => sum + row.amount, 0);
+    const changeLabel = (current, previous) => !previous ? "No prior-period data" : `${current >= previous ? "+" : ""}${Math.round((current - previous) / previous * 100)}% vs prior period`;
+    setText("income-change", changeLabel(income, priorIncome));
+    setText("expense-change", changeLabel(expenses, priorExpenses));
+
+    const focusedRows = mode === "income" ? incomeRows : mode === "spending" ? expenseRows : matching;
+    const focusedTotal = mode === "income" ? income : mode === "spending" ? expenses : income + expenses;
+    const groupField = mode === "income" ? "category" : mode === "spending" ? "category" : "type";
+    const totals = new Map();
+    focusedRows.forEach((row) => {
+      const name = mode === "general" ? (row.type === "income" ? "Income" : "Spending") : (row.category || "Other");
+      totals.set(name, (totals.get(name) || 0) + row.amount);
+    });
+    const sorted = [...totals.entries()].sort((a, b) => b[1] - a[1]);
     const legend = $("category-breakdown"); legend.replaceChildren();
-    if (!sorted.length) { const empty = document.createElement("li"); empty.textContent = "No spending in this period."; legend.appendChild(empty); }
-    else sorted.forEach(([name,amount],index) => { const li=document.createElement("li"); const label=document.createElement("span"); label.className="legend-label"; const dot=document.createElement("span"); dot.className="legend-dot"; dot.style.backgroundColor=COLORS[index%COLORS.length]; const text=document.createElement("span"); text.textContent=name; label.append(dot,text); const value=document.createElement("strong"); value.textContent=formatMoney(amount); li.append(label,value); legend.appendChild(li); });
-    const donut = $("spending-donut");
-    if (expenses > 0) { let angle=0; const segments=sorted.map(([,amount],index) => { const next=angle+amount/expenses*360; const segment=`${COLORS[index%COLORS.length]} ${angle}deg ${next}deg`; angle=next; return segment; }); donut.style.background=`conic-gradient(${segments.join(",")})`; }
-    else donut.style.background="conic-gradient(#e9edf1 0deg 360deg)";
-    donut?.setAttribute("aria-label",expenses ? `Spending by category, total ${formatMoney(expenses)}` : "No spending in this period");
-    const analysis=$("summary-analysis"); analysis.replaceChildren();
-    const notes=[];
-    if (!matching.length) notes.push("No transactions in this period yet. Add one to start your analysis.");
-    else {
-      if (sorted.length) notes.push(`Top spending: ${sorted[0][0]} at ${formatMoney(sorted[0][1])}${expenses ? ` (${Math.round(sorted[0][1]/expenses*100)}% of spending)` : ""}.`);
-      const topIncome=matching.filter((row)=>row.type==="income").sort((a,b)=>b.amount-a.amount)[0];
-      if (topIncome) notes.push(`Largest income: ${topIncome.description || topIncome.category} at ${formatMoney(topIncome.amount)}.`);
-      notes.push(income-expenses >= 0 ? `You ended this period ${formatMoney(income-expenses)} ahead.` : `Spending was ${formatMoney(expenses-income)} above income.`);
+    const modeLabels = { general: ["General balance", "All activity", "Top activity"], spending: ["Spending breakdown", "by category", "Top spending"], income: ["Income breakdown", "by category", "Top income"] };
+    const [chartLabel, chartDetail, listLabel] = modeLabels[mode];
+    setText("summary-chart-label", chartLabel);
+    setText("summary-chart-detail", chartDetail);
+    setText("summary-list-label", listLabel);
+    setText("category-period-count", `${sorted.length} ${sorted.length === 1 ? "category" : "categories"}`);
+    setText("donut-total", formatCompactMoney(focusedTotal));
+    setText("donut-percent", `${focusedTotal > 0 ? 100 : 0}%`);
+    setText("donut-caption", mode === "spending" ? "of spending" : mode === "income" ? "of income" : "accounted");
+
+    if (!sorted.length) {
+      const empty = document.createElement("li");
+      empty.className = "summary-empty-category";
+      empty.textContent = mode === "income" ? "No income in this period." : mode === "spending" ? "No spending in this period." : "No transactions in this period.";
+      legend.appendChild(empty);
+    } else {
+      sorted.slice(0, 6).forEach(([name, amount], index) => {
+        const percent = focusedTotal ? Math.round(amount / focusedTotal * 100) : 0;
+        const li = document.createElement("li");
+        const copy = document.createElement("div"); copy.className = "category-row-copy";
+        const label = document.createElement("span"); label.className = "legend-label";
+        const dot = document.createElement("i"); dot.className = "legend-dot"; dot.style.backgroundColor = mode === "income" ? "#70b79a" : mode === "spending" ? COLORS[index % COLORS.length] : (name === "Income" ? "#70b79a" : "#e06f61");
+        const labelText = document.createElement("strong"); labelText.textContent = name;
+        label.append(dot, labelText);
+        const detail = document.createElement("small"); detail.textContent = `${percent}% of ${mode === "income" ? "income" : mode === "spending" ? "spending" : "activity"}`;
+        copy.append(label, detail);
+        const value = document.createElement("strong"); value.className = "category-row-value"; value.textContent = formatMoney(amount);
+        const bar = document.createElement("span"); bar.className = "category-bar";
+        const fill = document.createElement("i"); fill.style.width = `${percent}%`; fill.style.backgroundColor = dot.style.backgroundColor; bar.appendChild(fill);
+        li.append(copy, value, bar); legend.appendChild(li);
+      });
     }
-    notes.forEach((note)=>{const li=document.createElement("li");li.textContent=note;analysis.appendChild(li);});
+    const donut = $("spending-donut");
+    if (sorted.length) {
+      let angle = 0;
+      const segments = sorted.map(([, amount], index) => {
+        const next = angle + (focusedTotal ? amount / focusedTotal * 360 : 0);
+        const color = mode === "income" ? "#70b79a" : mode === "spending" ? COLORS[index % COLORS.length] : (sorted[index][0] === "Income" ? "#70b79a" : "#e06f61");
+        const segment = `${color} ${angle}deg ${next}deg`; angle = next; return segment;
+      });
+      donut.style.background = `conic-gradient(${segments.join(",")})`;
+      donut.setAttribute("aria-label", `${chartLabel}, total ${formatMoney(focusedTotal)}`);
+    } else {
+      donut.style.background = "conic-gradient(#e9edf1 0deg 360deg)";
+      donut.setAttribute("aria-label", "No activity in this period");
+    }
+
+    const analysis = $("summary-analysis"); analysis.replaceChildren();
+    const notes = [];
+    if (!matching.length) notes.push("No transactions in this period yet. Add one to start your analysis.");
+    else if (mode === "spending") {
+      if (sorted.length) notes.push(`${sorted[0][0]} is the largest spending category at ${formatMoney(sorted[0][1])}.`);
+      notes.push(expenses <= income ? `You kept spending below or within income by ${formatMoney(Math.max(0, income - expenses))}.` : `Spending exceeded income by ${formatMoney(expenses - income)}.`);
+      if (priorExpenses > 0) notes.push(changeLabel(expenses, priorExpenses).replace("vs prior period", "compared with the prior period"));
+    } else if (mode === "income") {
+      if (sorted.length) notes.push(`${sorted[0][0]} contributes the most income at ${formatMoney(sorted[0][1])}.`);
+      notes.push(incomeRows.length ? `You recorded ${incomeRows.length} income transaction${incomeRows.length === 1 ? "" : "s"} this period.` : "No income was recorded this period.");
+    } else {
+      notes.push(income - expenses >= 0 ? `You ended the period with ${formatMoney(income - expenses)} left.` : `You exceeded income by ${formatMoney(expenses - income)}.`);
+      notes.push(`You recorded ${incomeRows.length} income and ${expenseRows.length} spending transaction${expenseRows.length === 1 ? "" : "s"}.`);
+      if (sorted.length) notes.push(`${sorted[0][0]} is the largest part of recorded activity.`);
+    }
+    notes.forEach((note) => { const li = document.createElement("li"); li.textContent = note; analysis.appendChild(li); });
   }
   function processRecurringTransactions() {
     const rows=readTransactions(), today=todayKey(); let changed=false;
@@ -397,6 +573,7 @@
   function todayKey(date=new Date()){return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;}
   function formatMoney(value){return new Intl.NumberFormat("en-PH",{style:"currency",currency:"PHP",minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(value)||0);}
   function formatCompactMoney(value){return new Intl.NumberFormat("en-PH",{style:"currency",currency:"PHP",notation:"compact",maximumFractionDigits:1}).format(Number(value)||0);}
+  function formatMonth(value){const date=new Date(`${value}T00:00:00`);return Number.isNaN(date.getTime())?value:new Intl.DateTimeFormat("en-PH",{month:"long",year:"numeric"}).format(date);}
   function formatDate(value){const date=new Date(`${value}T00:00:00`);return Number.isNaN(date.getTime())?value:new Intl.DateTimeFormat("en-PH",{year:"numeric",month:"short",day:"numeric"}).format(date);}
   function setText(id,value){const node=$(id);if(node)node.textContent=value;}
 })();

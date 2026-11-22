@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#fffaf5" />
+    <title>BaonBuddy Lesson</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/redesign.css" />
+    <link rel="stylesheet" href="/responsive-polish.css" />
+  </head>
+  <body class="lesson-page">
+    <main class="lesson-shell">
+      <header class="lesson-topbar">
+        <a class="lesson-back" href="/#learn" aria-label="Back to money journey">← <span>Journey</span></a>
+        <div class="lesson-progress-track" role="progressbar" aria-label="Lesson progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+          <div id="lesson-progress" class="lesson-progress-fill"></div>
+        </div>
+        <div class="lesson-xp"><span aria-hidden="true">⭐</span><strong id="lesson-xp-count">0 XP</strong></div>
+      </header>
+
+      <section id="teach-screen" class="lesson-screen teach-screen">
+        <div class="lesson-mascot"><img src="/erasebg-transformed.png" alt="" /><span aria-hidden="true">✦</span></div>
+        <p class="eyebrow" id="lesson-level-label">LEVEL 1</p>
+        <h1 id="lesson-title">Budget basics</h1>
+        <p id="investment-disclaimer" class="investment-disclaimer" hidden>General education only. Investing carries risk, and this is not personal financial advice.</p>
+        <div id="lesson-teach-card" class="lesson-teach-card"></div>
+        <button id="start-quiz" class="lesson-primary" type="button">Start quiz <span aria-hidden="true">→</span></button>
+      </section>
+
+      <section id="quiz-screen" class="lesson-screen quiz-screen" hidden>
+        <p class="eyebrow" id="quiz-label">QUICK CHECK 1 OF 3</p>
+        <h1 id="question-title">Which is the best first step?</h1>
+        <div id="answer-options" class="answer-options"></div>
+        <div id="answer-feedback" class="answer-feedback" role="status" aria-live="polite" hidden></div>
+        <button id="answer-next" class="lesson-primary" type="button" disabled>Check answer</button>
+      </section>
+
+      <section id="complete-screen" class="lesson-screen complete-screen" hidden>
+        <div class="complete-burst" aria-hidden="true"><span>⭐</span></div>
+        <p class="eyebrow">LEVEL COMPLETE</p>
+        <h1>Nice work, beh!</h1>
+        <p id="complete-copy">You finished this money lesson.</p>
+        <strong class="xp-earned">+20 XP</strong>
+        <a class="lesson-primary" href="/#learn">Continue journey <span aria-hidden="true">→</span></a>
+      </section>
+    </main>
+
+    <script>
+      const LESSONS_KEY = "baonbuddy-completed-lessons";
+      const QUESTS_KEY = "baonbuddy-quests";
+      const LessonSounds = (() => {
+        let context = null;
+        const enabled = localStorage.getItem("baonbuddy-sounds") !== "off";
+        function tone(frequency, duration, delay = 0) {
+          if (!enabled) return;
+          try {
+            context ||= new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = context.createOscillator();
+            const gain = context.createGain();
+            oscillator.frequency.value = frequency;
+            gain.gain.setValueAtTime(0.035, context.currentTime + delay);
+            gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + delay + duration);
+            oscillator.connect(gain).connect(context.destination);
+            oscillator.start(context.currentTime + delay);
+            oscillator.stop(context.currentTime + delay + duration);
+          } catch { /* Audio is optional. */ }
+        }
+        return {
+          tap: () => tone(440, 0.06),
+          success: () => { tone(523.25, 0.12); tone(659.25, 0.12, 0.09); tone(783.99, 0.18, 0.18); }
+        };
+      })();
+      const chapters = [
+        ["Money Basics", ["Money and you", "Needs and wants", "Income", "Expenses", "Emergency baon", "Tracking habits", "Budget words", "Simple plans", "Checking in", "Basics check"]],
+        ["Plan Your Baon", ["Your weekly plan", "A spending limit", "Food budget", "Fare planning", "School costs", "Flexible money", "Unplanned expenses", "Plan check-ins", "Adjusting a plan", "Planning check"]],
+        ["Saving Goals", ["Why save?", "Small amounts", "Clear goals", "A savings timeline", "Saving first", "Goal milestones", "Handling setbacks", "Separate savings", "Multiple goals", "Saving check"]],
+        ["Smart Choices", ["Pause before buying", "Compare prices", "Avoiding impulse buys", "Borrowing carefully", "Online shopping", "Subscriptions", "Scams and safety", "Value for money", "Responsible generosity", "Choices check"]],
+        ["Investing Basics", ["What investing means", "Risk and reward", "Time horizon", "Diversification", "Inflation", "Savings versus investing", "Common investments", "Fees and charges", "Red flags", "Investing check"]]
+      ];
+      const lessons = [];
+      chapters.forEach(([chapterTitle, titles], chapterIndex) => {
+        titles.forEach((title, localIndex) => {
+          const level = chapterIndex * 10 + localIndex + 1;
+          const core = [
+            ["Understand the idea", `“${title}” is part of the bigger picture: know what money you have, what decisions matter, and what result you want.`],
+            ["Use it with a real example", `Start with one real baon decision about ${title.toLowerCase()}. Separate facts from guesses, write down the amount, and choose a small next step you can review.`],
+            ["Avoid a common mistake", "Do not rush, copy someone else, or assume more money will solve every problem. Pause, compare, check for risk, and adjust when the facts change."]
+          ];
+          const chapterPractice = [
+            ["Check the basics", "Income is money received, expenses are money spent, and savings are money kept for a purpose. Do not count the same peso twice."],
+            ["Make a plan", "Put essential needs, scheduled costs, flexible spending, and savings into separate parts of the baon plan. Leave room for unexpected changes."],
+            ["Build a goal", "Choose a clear target, set a realistic deadline, and divide the target into smaller contributions. Progress can be small and still count."],
+            ["Choose carefully", "Compare the benefit, full cost, and alternatives before spending. A pause is especially useful for impulse buys and online offers."],
+            ["Understand investing", "Investing can help long-term goals grow, but prices can fall. Check the time horizon, risk, fees, diversification, and whether you may need the money soon."]
+          ];
+          core.push(chapterPractice[chapterIndex]);
+          const quizOptions = [
+            chapterIndex === 0
+              ? ["Guess and spend", "Identify the facts and goal", "Ignore the remaining baon"]
+              : chapterIndex === 1
+              ? ["Use all baon immediately", "Plan needs, flexible money, and changes", "Skip recording costs"]
+              : chapterIndex === 2
+              ? ["Choose a vague wish", "Set a clear target and small plan", "Wait for a large amount only"]
+              : chapterIndex === 3
+              ? ["Rush into the best-looking offer", "Compare costs, benefits, and risk", "Buy without checking"]
+              : ["Ignore risk and fees", "Check risk, horizon, and diversification", "Sell after every small change"]
+          ];
+          const questions = [
+            [`When working on “${title}”, what should come first?`, quizOptions[0], 1],
+            [`Which habit makes this topic more manageable?`, ["Pause and review one decision at a time", "Make every choice at the last minute", "Ignore your limits"], 0],
+            [`You find a detail you did not expect. What is the best response?`, ["Update the plan and check the consequences", "Pretend it does not matter", "Make a bigger promise"], 0],
+            [`What is the safest final step for a money decision?`, ["Check the amount, purpose, and risk", "Act only because others agree", "Leave all steps unrecorded"], 0]
+          ];
+          lessons.push({
+            title,
+            levelLabel: `CHAPTER ${chapterIndex + 1} · LEVEL ${localIndex + 1}`,
+            chapterLabel: chapterTitle,
+            teach: core,
+            questions
+          });
+        });
+      });
+
+      const params = new URLSearchParams(window.location.search);
+      const levelIndex = Math.max(0, Math.min(49, (Number(params.get("level")) || 1) - 1));
+      const lesson = lessons[levelIndex];
+      let questionIndex = 0;
+      let score = 0;
+      let selectedAnswer = null;
+      let checked = false;
+
+      document.title = `${lesson.title} | BaonBuddy`;
+      document.getElementById("lesson-level-label").textContent = lesson.levelLabel;
+      document.getElementById("lesson-title").textContent = lesson.title;
+      document.getElementById("investment-disclaimer").hidden = levelIndex < 40;
+      document.getElementById("lesson-teach-card").innerHTML = lesson.teach.map(([title, text], index) =>
+        `<article><span>${index + 1}</span><div><h2>${title}</h2><p>${text}</p></div></article>`
+      ).join("");
+
+      let completed = [];
+      try { completed = JSON.parse(localStorage.getItem(LESSONS_KEY) || "[]"); if (!Array.isArray(completed)) completed = []; } catch { completed = []; }
+      if (levelIndex > 0 && !completed.includes(levelIndex - 1)) {
+        window.location.replace("/#learn");
+      }
+      const questState = (() => { try { return JSON.parse(localStorage.getItem(QUESTS_KEY) || "null") || {}; } catch { return {}; } })();
+      document.getElementById("lesson-xp-count").textContent = `${Number(questState.points) || 0} XP`;
+
+      function setPhase(showId) {
+        ["teach-screen", "quiz-screen", "complete-screen"].forEach((id) => {
+          document.getElementById(id).hidden = id !== showId;
+        });
+        const progress = showId === "teach-screen" ? 25 : showId === "quiz-screen" ? 50 + ((questionIndex + 1) / lesson.questions.length) * 40 : 100;
+        document.getElementById("lesson-progress").style.width = `${progress}%`;
+        document.querySelector(".lesson-progress-track").setAttribute("aria-valuenow", String(Math.round(progress)));
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      function showQuestion() {
+        const [question, options] = lesson.questions[questionIndex];
+        selectedAnswer = null;
+        checked = false;
+        document.getElementById("quiz-label").textContent = `QUICK CHECK ${questionIndex + 1} OF ${lesson.questions.length}`;
+        document.getElementById("question-title").textContent = question;
+        const feedback = document.getElementById("answer-feedback");
+        feedback.hidden = true;
+        feedback.className = "answer-feedback";
+        const next = document.getElementById("answer-next");
+        next.textContent = "Check answer";
+        next.disabled = true;
+        document.getElementById("answer-options").innerHTML = options.map((option, index) =>
+          `<button class="answer-option" type="button" data-answer="${index}"><span>${String.fromCharCode(65 + index)}</span><strong>${option}</strong></button>`
+        ).join("");
+        document.querySelectorAll(".answer-option").forEach((option) => option.addEventListener("click", () => {
+          if (checked) return;
+          LessonSounds.tap();
+          selectedAnswer = Number(option.dataset.answer);
+          document.querySelectorAll(".answer-option").forEach((item) => item.classList.remove("selected"));
+          option.classList.add("selected");
+          next.disabled = false;
+        }));
+        setPhase("quiz-screen");
+      }
+
+      document.getElementById("start-quiz").addEventListener("click", () => { LessonSounds.tap(); showQuestion(); });
+
+      document.getElementById("answer-next").addEventListener("click", (event) => {
+        LessonSounds.tap();
+        const next = event.currentTarget;
+        const [, , correctIndex] = lesson.questions[questionIndex];
+        if (!checked) {
+          checked = true;
+          const isCorrect = selectedAnswer === correctIndex;
+          if (isCorrect) score += 1;
+          document.querySelectorAll(".answer-option").forEach((option, index) => {
+            option.disabled = true;
+            if (index === correctIndex) option.classList.add("correct");
+            if (index === selectedAnswer && !isCorrect) option.classList.add("wrong");
+          });
+          const feedback = document.getElementById("answer-feedback");
+          feedback.hidden = false;
+          feedback.classList.add(isCorrect ? "correct" : "wrong");
+          feedback.innerHTML = `<strong>${isCorrect ? "Correct!" : "Good try!"}</strong><span>${isCorrect ? "That is the best money move here." : "The highlighted answer shows the strongest choice."}</span>`;
+          next.textContent = questionIndex === lesson.questions.length - 1 ? "See result" : "Next question";
+          return;
+        }
+        if (questionIndex < lesson.questions.length - 1) {
+          questionIndex += 1;
+          showQuestion();
+          return;
+        }
+        if (score === lesson.questions.length) completeLesson();
+        else {
+          score = 0;
+          questionIndex = 0;
+          document.getElementById("complete-screen").hidden = false;
+          document.getElementById("quiz-screen").hidden = true;
+          document.getElementById("teach-screen").hidden = true;
+          document.querySelector(".complete-burst").innerHTML = '<span>↻</span>';
+          document.querySelector(".complete-screen .eyebrow").textContent = "TRY AGAIN";
+          document.querySelector(".complete-screen h1").textContent = "Almost, beh!";
+          document.getElementById("complete-copy").textContent = "Review the lesson and give the quiz another go.";
+          document.querySelector(".xp-earned").textContent = "0 XP earned";
+          const continueButton = document.querySelector(".complete-screen .lesson-primary");
+          continueButton.textContent = "Retry quiz";
+          continueButton.href = "#";
+          continueButton.onclick = (retryEvent) => { retryEvent.preventDefault(); location.reload(); };
+        }
+      });
+
+      function completeLesson() {
+        const newlyCompleted = !completed.includes(levelIndex);
+        if (newlyCompleted) {
+          completed.push(levelIndex);
+          localStorage.setItem(LESSONS_KEY, JSON.stringify(completed));
+          let state = {};
+          try { state = JSON.parse(localStorage.getItem(QUESTS_KEY) || "null") || {}; } catch { state = {}; }
+          state.points = (Number(state.points) || 0) + 20;
+          state.coins = (Number(state.coins) || 0) + 5;
+          localStorage.setItem(QUESTS_KEY, JSON.stringify(state));
+          let progress = {};
+          try { progress = JSON.parse(localStorage.getItem("baonbuddy-progress") || "null") || {}; } catch { progress = {}; }
+          progress.xp = (Number(progress.xp) || 0) + 20;
+          progress.coins = (Number(progress.coins) || 0) + 5;
+          progress.achievements = progress.achievements || {};
+          if (completed.length === 1) progress.achievements["first-lesson"] = new Date().toISOString();
+          if (completed.length >= 10) progress.achievements["chapter-one"] = progress.achievements["chapter-one"] || new Date().toISOString();
+          if (completed.length >= 50) progress.achievements["graduate"] = new Date().toISOString();
+          localStorage.setItem("baonbuddy-progress", JSON.stringify(progress));
+        }
+        document.querySelector(".complete-burst").innerHTML = "<span>⭐</span>";
+        document.querySelector(".complete-screen .eyebrow").textContent = "LEVEL COMPLETE";
+        document.querySelector(".complete-screen h1").textContent = "Nice work, beh!";
+        document.getElementById("complete-copy").textContent = `You passed ${lesson.title} and unlocked the next level.`;
+        document.querySelector(".xp-earned").textContent = newlyCompleted ? "+20 XP" : "Already completed";
+        const continueButton = document.querySelector(".complete-screen .lesson-primary");
+        continueButton.textContent = "Continue journey →";
+        continueButton.href = "/#learn";
+        setPhase("complete-screen");
+      }
+    </script>
+  </body>
+</html>
