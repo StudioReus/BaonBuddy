@@ -271,7 +271,7 @@ function recordSavings(amount) {
   const quest = state.weeklyTasks?.find((task) => task.id === "week-save");
   if (quest && state.weeklySaved >= WEEKLY_TARGET) completeQuest("weekly", "week-save");
   if (window.BaonBuddyProgress) {
-    window.BaonBuddyProgress.addXp(10, 2);
+    window.BaonBuddyProgress.addXp(10);
     window.BaonBuddyProgress.unlock("first-save");
   }
   renderQuests();
@@ -445,7 +445,7 @@ function setupTutorial() {
     { tab: "dashboard", target: "#spending-summary-content", icon: "↗", title: "See where it went", copy: "Your cards and spending summary update automatically. This helps you check how much baon is left." },
     { tab: "goals", target: ".goal-panel", icon: "◎", title: "Set a savings goal", copy: "Open Goals to create something you want to save for, then add small contributions as you can." },
     { tab: "learn", target: ".lesson-path", icon: "▥", title: "Learn in small steps", copy: "Open Learn and pass one level at a time. Completing levels adds XP and unlocks the next challenge." },
-    { tab: "goals", target: "#achievement-grid", icon: "★", title: "Earn rewards", copy: "Achievements award XP and coins. Use coins in the Buddy wardrobe, then come back and keep your streak going." }
+    { tab: "goals", target: "#achievement-grid", icon: "★", title: "Earn rewards", copy: "Achievements award XP. Keep learning and check back to watch your streak grow." }
   ];
   let stepIndex = 0;
   let previousFocus = null;

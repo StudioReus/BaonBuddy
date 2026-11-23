@@ -320,7 +320,7 @@
     if (!wasEditing && typeof completeQuest === "function") completeQuest("daily", "log-transaction");
     if (!wasEditing && window.BaonBuddyProgress) {
       window.BaonBuddyProgress.checkIn();
-      window.BaonBuddyProgress.addXp(5, 1);
+      window.BaonBuddyProgress.addXp(5);
       window.BaonBuddyProgress.evaluateAchievements();
     }
     $("category")?.focus();

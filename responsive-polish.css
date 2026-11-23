@@ -53,7 +53,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .header-stat strong { grid-area: value; font-size: .85rem; line-height: 1; }
 .header-stat small { grid-area: label; margin-top: 3px; color: var(--muted); font-size: .58rem; font-weight: 800; }
 .header-stat.xp strong { color: #a9680c; }
-.header-stat.coins strong { color: #557aa2; }
 
 /* Keep the brand welcome present, but let the useful dashboard lead. */
 .welcome {
@@ -450,39 +449,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .achievement-toast small { display:block;color:#a9680c;font-size:.58rem;font-weight:900;letter-spacing:.08em; }
 .achievement-toast strong { display:block;margin-top:2px;font-size:.88rem; }
 .achievement-toast p { margin:2px 0 0;color:#718094;font-size:.72rem; }
-.buddy-shop {
-  margin-top:16px;
-  padding:22px;
-  border:1px solid #e7eaf0;
-  border-radius:20px;
-  background:#fff;
-  box-shadow:var(--shadow);
-}
-.shop-grid { display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin-top:14px; }
-.shop-item {
-  display:grid;
-  min-width:0;
-  justify-items:center;
-  gap:7px;
-  padding:12px 8px 9px;
-  border:1.5px solid #edf0f3;
-  border-radius:14px;
-  background:#fafbfc;
-  text-align:center;
-}
-.shop-item.equipped { border-color:#efc889;background:#fff9ee; }
-.shop-icon { display:grid;width:48px;height:48px;place-items:center;border-radius:50%;background:#fff1c9;font-size:1.35rem; }
-.shop-item strong,.shop-item small { display:block; }
-.shop-item strong { font-size:.72rem; }
-.shop-item small { margin-top:2px;color:#718094;font-size:.62rem; }
-.shop-item button { min-height:32px;width:100%;border:0;border-radius:9px;background:#f2a83a;color:#fff;font-size:.68rem;font-weight:900; }
-body[data-buddy-effect="glasses"] .welcome-buddy::after,
-body[data-buddy-effect="star"] .welcome-buddy::after,
-body[data-buddy-effect="scholar"] .welcome-buddy::after { position:absolute;top:-8px;right:-4px;padding:4px 7px;border-radius:999px;background:#fff;color:#a9680c;content:"✦";box-shadow:0 5px 12px rgba(38,53,71,.10); }
-body[data-buddy-effect="glasses"] .welcome-buddy::after { content:"🤓"; }
-body[data-buddy-effect="star"] .welcome-buddy::after { content:"⭐"; }
-body[data-buddy-effect="scholar"] .welcome-buddy::after { content:"🎓"; }
-body[data-buddy-effect="sunset"] .welcome-buddy { background:linear-gradient(135deg,#fff1d9,#ffd4ac); }
 @keyframes achievement-toast-in {
   from { opacity:0;transform:translate(-50%,12px) scale(.96); }
   to { opacity:1;transform:translate(-50%,0) scale(1); }
@@ -741,8 +707,6 @@ body[data-buddy-effect="sunset"] .welcome-buddy { background:linear-gradient(135
   .category-breakdown li { min-height: 52px; }
   .daily-goal-panel { padding: 14px; }
   .daily-goal-ring { width: 72px; height: 72px; }
-  .shop-item { grid-template-columns: 42px minmax(0,1fr); }
-  .shop-icon { width:42px;height:42px; }
   .app { width: calc(100% - 28px); padding: 12px 0 96px; }
   .page-header { margin-bottom: 14px; }
   .brand { gap: 7px; font-size: 1.08rem; }
@@ -817,8 +781,6 @@ body[data-buddy-effect="sunset"] .welcome-buddy { background:linear-gradient(135
   .chapter-node-label strong { font-size:.62rem; }
   .achievement-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
   .achievement-card { min-height:76px; }
-  .shop-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
-  .buddy-shop { padding:16px; }
   .achievement-toast { bottom:88px; }
   .learn-wrap::before { left: 32px; }
   .lesson-path { min-height: 560px; max-width: 360px; }
@@ -1184,16 +1146,6 @@ button:disabled { filter: grayscale(.08); }
 }
 .daily-goal-ring strong { font-size: 1.15rem; line-height: 1; }
 .daily-goal-ring span { color: #718094; font-size: .58rem; }
-.shop-item {
-  grid-template-columns: 48px minmax(0, 1fr);
-  align-items: center;
-  text-align: left;
-}
-.shop-item > div { min-width: 0; }
-.shop-item small { min-height: 30px; line-height: 1.35; }
-.shop-item b { display: block; margin-top: 5px; color: #a9680c; font-size: .62rem; }
-.shop-item button { grid-column: 1 / -1; }
-
 .welcome-actions {
   display: flex;
   align-items: center;
@@ -1499,6 +1451,29 @@ body.tutorial-open {
     max-width: 100%;
   }
 
+  .summary-topbar { align-items: stretch; }
+  .summary-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; }
+  .summary-controls select,
+  .summary-controls input { width: 100%; min-width: 0; }
+  .summary-period-label { overflow-wrap: anywhere; }
+  .summary-detail-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .summary-chart-card { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .summary-chart-heading { min-width: 0; flex-wrap: wrap; }
+  .summary-chart-card .summary-chart-heading { height: auto; }
+  .spending-donut { width: min(132px, 100%); margin: 0 auto; }
+  .category-breakdown li { grid-template-columns: minmax(0, 1fr) auto; }
+  .summary-card strong { font-size: clamp(.82rem, 4vw, 1rem); }
+
+  .learn-wrap::before { display: none; }
+  .lesson-path { display: grid; min-height: 0; max-width: none; gap: 10px; padding: 14px 0 0; }
+  .chapter-node { position: relative; top: auto; right: auto; bottom: auto; left: auto; display: flex; width: 100%; min-height: 70px; align-items: center; gap: 12px; padding: 9px 12px; border: 1px solid #e9edf2; border-bottom: 4px solid #e5c27c; border-radius: 14px; background: #fff; text-align: left; transform: none; }
+  .chapter-node:hover,
+  .chapter-node:active { transform: none; }
+  .chapter-node-ring { width: 42px; height: 42px; flex: 0 0 42px; }
+  .chapter-node-label { width: auto; max-width: none; margin: 0; padding: 0; border: 0; background: transparent; box-shadow: none; text-align: left; }
+  .chapter-node-label strong { font-size: .78rem; }
+  .chapter-node-label small { display: block; font-size: .65rem; }
+
   #transaction-form,
   .goal-form,
   .recurring-row,
@@ -1551,12 +1526,10 @@ body.tutorial-open {
     min-width: 0;
   }
 
-  .achievement-grid,
-  .shop-grid {
+  .achievement-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .shop-item,
   .achievement-card {
     min-width: 0;
   }
@@ -1657,8 +1630,7 @@ body.tutorial-open {
 
   .panel,
   .goal-panel,
-  .achievement-panel,
-  .buddy-shop {
+  .achievement-panel {
     padding-inline: 12px;
   }
 

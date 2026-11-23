@@ -20,28 +20,17 @@
     { id: "activity-30", title: "Money Tracker", text: "Record 30 transactions.", icon: "✓" },
     { id: "graduate", title: "Money Graduate", text: "Complete all 50 levels.", icon: "♛" }
   ];
-  const COSMETICS = [
-    { id: "buddy-default", name: "Original Buddy", icon: "🐣", price: 0, effect: "", description: "The classic BaonBuddy look." },
-    { id: "buddy-glasses", name: "Study Glasses", icon: "🤓", price: 20, effect: "glasses", description: "Adds a study-buddy badge." },
-    { id: "buddy-star", name: "Star Buddy", icon: "⭐", price: 35, effect: "star", description: "Adds a star to your Buddy." },
-    { id: "buddy-sunset", name: "Sunset Buddy", icon: "🌅", price: 50, effect: "sunset", description: "Gives your Buddy a warm sunset theme." },
-    { id: "buddy-scholar", name: "Scholar Buddy", icon: "🎓", price: 75, effect: "scholar", description: "Adds a scholar badge for completed progress." }
-  ];
-
   function defaultState() {
     let legacy = {};
     try { legacy = JSON.parse(localStorage.getItem(LEGACY_KEY) || "null") || {}; } catch { legacy = {}; }
     return {
       xp: Number(legacy.points) || 0,
-      coins: Number(legacy.coins) || 0,
       streak: Number(legacy.currentStreak) || 0,
       bestStreak: Number(legacy.bestStreak) || 0,
       lastCompletedDate: String(legacy.lastCompletedDate || ""),
       dailyXpDate: "",
       dailyXp: 0,
-      achievements: {},
-      ownedItems: ["buddy-default"],
-      equipped: "buddy-default"
+      achievements: {}
     };
   }
 
@@ -60,10 +49,9 @@
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).slice(0).padStart(2, "0")}`;
   }
 
-  function addXp(amount, coins = 0) {
+  function addXp(amount) {
     const state = read();
     state.xp += Math.max(0, amount);
-    state.coins += Math.max(0, coins);
     if (state.dailyXpDate !== today()) {
       state.dailyXpDate = today();
       state.dailyXp = 0;
@@ -92,9 +80,8 @@
     const state = read();
     if (state.achievements[id]) return false;
     state.achievements[id] = today();
-    const reward = id === "graduate" ? { xp: 150, coins: 30 } : id === "goal-reached" ? { xp: 50, coins: 12 } : { xp: 25, coins: 5 };
+    const reward = id === "graduate" ? { xp: 150 } : id === "goal-reached" ? { xp: 50 } : { xp: 25 };
     state.xp += reward.xp;
-    state.coins += reward.coins;
     write(state);
     renderAll();
     showAchievementToast(id, reward);
@@ -107,14 +94,13 @@
     document.querySelector(".achievement-toast")?.remove();
     const toast = document.createElement("div");
     toast.className = "achievement-toast";
-    toast.innerHTML = `<span>${achievement.icon}</span><div><small>ACHIEVEMENT UNLOCKED</small><strong>${achievement.title}</strong><p>+${reward.xp} XP · +${reward.coins} coins</p></div>`;
+    toast.innerHTML = `<span>${achievement.icon}</span><div><small>ACHIEVEMENT UNLOCKED</small><strong>${achievement.title}</strong><p>+${reward.xp} XP</p></div>`;
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 4500);
   }
 
   function renderHeader(state = read()) {
     setText("header-xp", String(state.xp));
-    setText("header-coins", String(state.coins));
     setText("header-streak", String(state.streak));
   }
 
@@ -148,52 +134,10 @@
     if (message) message.textContent = earned >= goal ? "Daily goal complete. Nice work!" : `Earn ${goal - earned} more XP today.`;
   }
 
-  function renderShop() {
-    const grid = document.getElementById("shop-grid");
-    const coins = document.getElementById("shop-coins");
-    if (!grid) return;
-    const state = read();
-    if (coins) coins.textContent = `${state.coins} ◉`;
-    grid.replaceChildren(...COSMETICS.map((item) => {
-      const owned = state.ownedItems.includes(item.id);
-      const equipped = state.equipped === item.id;
-      const card = document.createElement("article");
-      card.className = `shop-item${equipped ? " equipped" : ""}`;
-      card.innerHTML = `<span class="shop-icon" aria-hidden="true">${item.icon}</span><div><strong>${item.name}</strong><small>${item.description}</small><b>${owned ? (equipped ? "Equipped" : "Owned") : `${item.price} coins`}</b></div><button type="button"${owned ? "" : ' aria-label="Purchase ' + item.name + '"'}>${owned ? (equipped ? "Wearing" : "Equip") : "Get"}</button>`;
-      card.querySelector("button").addEventListener("click", () => {
-        const current = read();
-        if (!current.ownedItems.includes(item.id)) {
-          if (current.coins < item.price) {
-            showShopNotice(`You need ${item.price - current.coins} more coins.`);
-            return;
-          }
-          current.coins -= item.price;
-          current.ownedItems.push(item.id);
-        }
-        current.equipped = item.id;
-        write(current);
-        document.body.dataset.buddyEffect = item.effect;
-        renderAll();
-        showShopNotice(`${item.name} equipped.`);
-      });
-      return card;
-    }));
-  }
-
-  function showShopNotice(message) {
-    document.querySelector(".achievement-toast")?.remove();
-    const toast = document.createElement("div");
-    toast.className = "achievement-toast";
-    toast.innerHTML = `<span>◉</span><div><small>BUDDY SHOP</small><strong>${message}</strong></div>`;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 2800);
-  }
-
   function renderAll() {
     renderHeader();
     renderDailyGoal();
     renderAchievements();
-    renderShop();
   }
 
   function setText(id, value) {
@@ -297,9 +241,5 @@
     renderAll();
     setupCompanion();
     setupLearn();
-    renderShop();
-    const equipped = read().equipped;
-    const cosmetic = COSMETICS.find((item) => item.id === equipped);
-    document.body.dataset.buddyEffect = cosmetic?.effect || "";
   });
 })();

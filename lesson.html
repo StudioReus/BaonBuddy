@@ -239,12 +239,10 @@
           let state = {};
           try { state = JSON.parse(localStorage.getItem(QUESTS_KEY) || "null") || {}; } catch { state = {}; }
           state.points = (Number(state.points) || 0) + 20;
-          state.coins = (Number(state.coins) || 0) + 5;
           localStorage.setItem(QUESTS_KEY, JSON.stringify(state));
           let progress = {};
           try { progress = JSON.parse(localStorage.getItem("baonbuddy-progress") || "null") || {}; } catch { progress = {}; }
           progress.xp = (Number(progress.xp) || 0) + 20;
-          progress.coins = (Number(progress.coins) || 0) + 5;
           progress.achievements = progress.achievements || {};
           if (completed.length === 1) progress.achievements["first-lesson"] = new Date().toISOString();
           if (completed.length >= 10) progress.achievements["chapter-one"] = progress.achievements["chapter-one"] || new Date().toISOString();
